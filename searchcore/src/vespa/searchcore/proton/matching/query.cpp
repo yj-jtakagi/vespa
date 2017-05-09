@@ -169,8 +169,8 @@ Query::createSearch(MatchData &md) const
 
 RangeLimitMetaInfo
 Query::locate(vespalib::stringref field) const {
-    (void) field;
-    return RangeLimitMetaInfo();
+    LocateRangeItemFromQuery locator(*_blueprint);
+    return locator.locate(field);
 }
 
 }

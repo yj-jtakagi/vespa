@@ -494,6 +494,11 @@ LeafBlueprint::createSearch(fef::MatchData &md, bool strict) const
     return createLeafSearch(tfmda, strict);
 }
 
+bool
+LeafBlueprint::getRange(vespalib::string &, vespalib::string &) const {
+    return false;
+}
+
 void
 LeafBlueprint::optimize(Blueprint* &self)
 {

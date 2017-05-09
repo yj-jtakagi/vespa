@@ -4,6 +4,8 @@
 
 #include <vespa/vespalib/stllike/string.h>
 
+namespace search::queryeval { class Blueprint; }
+
 namespace proton::matching {
 
 class RangeLimitMetaInfo {
@@ -26,6 +28,14 @@ class RangeQueryLocator {
 public:
     virtual ~RangeQueryLocator() {}
     virtual RangeLimitMetaInfo locate(vespalib::stringref field) const = 0;
+};
+
+class LocateRangeItemFromQuery : RangeQueryLocator {
+public:
+    LocateRangeItemFromQuery(const search::queryeval::Blueprint & blueprint) : _blueprint(blueprint) {}
+    RangeLimitMetaInfo locate(vespalib::stringref field) const override;
+private:
+    const search::queryeval::Blueprint & _blueprint;
 };
 
 }

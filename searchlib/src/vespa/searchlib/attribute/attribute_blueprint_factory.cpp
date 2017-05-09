@@ -82,26 +82,32 @@ class AttributeFieldBlueprint :
 {
 private:
     ISearchContext::UP _search_context;
+    enum Type {INT, FLOAT, OTHER};
+    Type _type;
 
     AttributeFieldBlueprint(const FieldSpec &field,
                             const IAttributeVector &attribute,
                             const string &query_stack,
                             const attribute::SearchContextParams &params)
         : SimpleLeafBlueprint(field),
-          _search_context(attribute.createSearchContext(QueryTermDecoder::decodeTerm(query_stack), params).release())
+          _search_context(attribute.createSearchContext(QueryTermDecoder::decodeTerm(query_stack), params).release()),
+          _type(OTHER)
     {
         uint32_t estHits = _search_context->approximateHits();
         HitEstimate estimate(estHits, estHits == 0);
         setEstimate(estimate);
+        if (attribute.isFloatingPointType()) {
+            _type = FLOAT;
+        } else if (attribute.isIntegerType()) {
+            _type = INT;
+        }
     }
 
 public:
     AttributeFieldBlueprint(const FieldSpec &field,
                             const IAttributeVector &attribute,
                             const string &query_stack)
-        : AttributeFieldBlueprint(field,
-                                  attribute,
-                                  query_stack,
+        : AttributeFieldBlueprint(field, attribute, query_stack,
                                   attribute::SearchContextParams()
                                   .useBitVector(field.isFilter()))
     {
@@ -113,9 +119,7 @@ public:
                             const string &query_stack,
                             size_t diversityCutoffGroups,
                             bool diversityCutoffStrict)
-        : AttributeFieldBlueprint(field,
-                                  attribute,
-                                  query_stack,
+        : AttributeFieldBlueprint(field, attribute, query_stack,
                                   attribute::SearchContextParams()
                                       .diversityAttribute(&diversity)
                                       .useBitVector(field.isFilter())
@@ -123,6 +127,8 @@ public:
                                       .diversityCutoffStrict(diversityCutoffStrict))
     {
     }
+
+    bool getRange(vespalib::string &from, vespalib::string &to) const override;
 
     SearchIterator::UP createLeafSearch(const TermFieldMatchDataArray &tfmda, bool strict) const override {
         assert(tfmda.size() == 1);
@@ -141,6 +147,29 @@ AttributeFieldBlueprint::visitMembers(vespalib::ObjectVisitor &visitor) const
 {
     search::queryeval::LeafBlueprint::visitMembers(visitor);
     visit(visitor, "attribute", _search_context->attributeName());
+}
+
+bool AttributeFieldBlueprint::getRange(vespalib::string &from, vespalib::string &to) const {
+    if (_type == INT) {
+        int64_t lower(0), upper(0);
+        _search_context->queryTerm().getAsIntegerTerm(lower, upper);
+        char buf[32];
+        sprintf(buf, "%ld", lower);
+        from = buf;
+        sprintf(buf, "%ld", upper);
+        to = buf;
+        return true;
+    } else if (_type == FLOAT) {
+        double lower(0), upper(0);
+        _search_context->queryTerm().getAsDoubleTerm(lower, upper);
+        char buf[32];
+        sprintf(buf, "%g", lower);
+        from = buf;
+        sprintf(buf, "%g", upper);
+        to = buf;
+        return true;
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------------
