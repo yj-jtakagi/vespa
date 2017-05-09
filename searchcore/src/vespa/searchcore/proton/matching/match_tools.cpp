@@ -165,7 +165,7 @@ MatchToolsFactory(QueryLimiter               & queryLimiter,
         double diversity_cutoff_factor = DiversityCutoffFactor::lookup(rankProperties);
         vespalib::string diversity_cutoff_strategy = DiversityCutoffStrategy::lookup(rankProperties);
         if (!limit_attribute.empty() && limit_maxhits > 0) {
-            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), *this,
+            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), _query,
                             searchContext.getAttributes(), _requestContext,
                             limit_attribute, limit_maxhits, !limit_ascending, limit_max_filter_coverage,
                             samplePercentage, postFilterMultiplier,
@@ -173,7 +173,7 @@ MatchToolsFactory(QueryLimiter               & queryLimiter,
                             diversity_cutoff_factor,
                             AttributeLimiter::toDiversityCutoffStrategy(diversity_cutoff_strategy)));
         } else if (_rankSetup.hasMatchPhaseDegradation()) {
-            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), *this,
+            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), _query,
                             searchContext.getAttributes(), _requestContext,
                             _rankSetup.getDegradationAttribute(), _rankSetup.getDegradationMaxHits(),
                             !_rankSetup.isDegradationOrderAscending(), _rankSetup.getDegradationMaxFilterCoverage(),
@@ -199,9 +199,5 @@ MatchToolsFactory::createMatchTools() const
                            _mdl, _rankSetup, _featureOverrides));
 }
 
-RangeLimitMetaInfo MatchToolsFactory::locate(vespalib::stringref field) const {
-    (void) field;
-    return RangeLimitMetaInfo();
 }
 
-}

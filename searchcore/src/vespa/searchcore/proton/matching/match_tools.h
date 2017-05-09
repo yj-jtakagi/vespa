@@ -68,7 +68,7 @@ public:
     void setup_dump();
 };
 
-class MatchToolsFactory : public RangeQueryLocator
+class MatchToolsFactory
 {
 private:
     QueryLimiter                  & _queryLimiter;
@@ -105,7 +105,7 @@ public:
     MatchTools::UP createMatchTools() const;
     search::queryeval::Blueprint::HitEstimate estimate() const { return _query.estimate(); }
     bool has_first_phase_rank() const { return !_rankSetup.getFirstPhaseRank().empty(); }
-    RangeLimitMetaInfo locate(vespalib::stringref field) const override;
 };
 
 }
+

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "rangequerylocator.h"
 #include <vespa/searchlib/fef/location.h>
 #include <vespa/searchlib/fef/itermdata.h>
 #include <vespa/searchlib/fef/matchdatalayout.h>
@@ -15,7 +16,7 @@ namespace proton::matching {
 class ViewResolver;
 class ISearchContext;
 
-class Query
+class Query : public RangeQueryLocator
 {
 private:
     using Blueprint=search::queryeval::Blueprint;
@@ -100,6 +101,8 @@ public:
      * @return estimate of hits produced.
      */
     Blueprint::HitEstimate estimate() const;
+
+    RangeLimitMetaInfo locate(vespalib::stringref field) const override;
 };
 
 }

@@ -13,15 +13,6 @@ using vespalib::string;
 
 namespace proton::matching {
 
-RangeLimitMetaInfo::RangeLimitMetaInfo() = default;
-RangeLimitMetaInfo::RangeLimitMetaInfo(vespalib::stringref low_, vespalib::stringref high_, size_t estimate_)
-        : _valid(true),
-          _estimate(estimate_),
-          _low(low_),
-          _high(high_)
-{}
-RangeLimitMetaInfo::~RangeLimitMetaInfo() {}
-
 AttributeLimiter::AttributeLimiter(const RangeQueryLocator & rangeQueryLocator,
                                    Searchable &searchable_attributes,
                                    const IRequestContext & requestContext,
