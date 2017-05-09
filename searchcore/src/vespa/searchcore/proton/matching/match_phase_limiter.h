@@ -10,8 +10,7 @@
 #include <vespa/vespalib/util/sync.h>
 #include <atomic>
 
-namespace proton {
-namespace matching {
+namespace proton::matching {
 
 class LimitedSearch : public search::queryeval::SearchIterator {
 public:
@@ -120,6 +119,4 @@ public:
     size_t getDocIdSpaceEstimate() const override;
 };
 
-} // namespace proton::matching
-} // namespace proton
-
+}

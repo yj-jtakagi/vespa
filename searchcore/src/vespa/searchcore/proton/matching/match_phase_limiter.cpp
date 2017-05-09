@@ -12,8 +12,7 @@ using search::queryeval::IRequestContext;
 using search::queryeval::AndSearchStrict;
 using search::queryeval::NoUnpack;
 
-namespace proton {
-namespace matching {
+namespace proton::matching {
 
 namespace {
 
@@ -145,5 +144,4 @@ MatchPhaseLimiter::getDocIdSpaceEstimate() const
     return _coverage.getEstimate();
 }
 
-} // namespace proton::matching
-} // namespace proton
+}

@@ -2,10 +2,12 @@
 
 #include "match_thread.h"
 #include "document_scorer.h"
-#include <vespa/searchlib/common/featureset.h>
-#include <vespa/searchlib/query/base.h>
+#include <vespa/searchcore/grouping/groupingmanager.h>
 #include <vespa/searchlib/queryeval/multibitvectoriterator.h>
 #include <vespa/searchlib/queryeval/andnotsearch.h>
+#include <vespa/searchlib/common/featureset.h>
+#include <vespa/searchlib/common/bitvector.h>
+#include <vespa/searchlib/query/base.h>
 #include <vespa/vespalib/util/closure.h>
 #include <vespa/vespalib/util/thread_bundle.h>
 #include <vespa/searchcore/grouping/groupingmanager.h>

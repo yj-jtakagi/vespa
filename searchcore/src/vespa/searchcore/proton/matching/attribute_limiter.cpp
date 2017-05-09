@@ -1,18 +1,17 @@
 // Copyright 2017 Yahoo Holdings. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
 
 #include "attribute_limiter.h"
-#include <vespa/vespalib/util/stringfmt.h>
 #include <vespa/searchlib/fef/matchdatalayout.h>
 #include <vespa/searchlib/query/tree/range.h>
 #include <vespa/searchlib/query/tree/simplequery.h>
+#include <vespa/vespalib/util/stringfmt.h>
 
 using namespace search::queryeval;
 using namespace search::query;
 using vespalib::make_string;
 using vespalib::string;
 
-namespace proton {
-namespace matching {
+namespace proton::matching {
 
 AttributeLimiter::AttributeLimiter(Searchable &searchable_attributes,
                                    const IRequestContext & requestContext,
@@ -86,5 +85,4 @@ AttributeLimiter::create_search(size_t want_hits, size_t max_group_size, bool st
     return _blueprint->createSearch(*_match_datas.back(), strictSearch);
 }
 
-} // namespace proton::matching
-} // namespace proton
+}
