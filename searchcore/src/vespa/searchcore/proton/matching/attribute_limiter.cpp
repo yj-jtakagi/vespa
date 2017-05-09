@@ -13,7 +13,17 @@ using vespalib::string;
 
 namespace proton::matching {
 
-AttributeLimiter::AttributeLimiter(Searchable &searchable_attributes,
+RangeLimitMetaInfo::RangeLimitMetaInfo() = default;
+RangeLimitMetaInfo::RangeLimitMetaInfo(vespalib::stringref low_, vespalib::stringref high_, size_t estimate_)
+        : _valid(true),
+          _estimate(estimate_),
+          _low(low_),
+          _high(high_)
+{}
+RangeLimitMetaInfo::~RangeLimitMetaInfo() {}
+
+AttributeLimiter::AttributeLimiter(const RangeQueryLocator & rangeQueryLocator,
+                                   Searchable &searchable_attributes,
                                    const IRequestContext & requestContext,
                                    const string &attribute_name,
                                    bool descending,
@@ -22,6 +32,7 @@ AttributeLimiter::AttributeLimiter(Searchable &searchable_attributes,
                                    DiversityCutoffStrategy diversityCutoffStrategy)
     : _searchable_attributes(searchable_attributes),
       _requestContext(requestContext),
+      _rangeQueryLocator(rangeQueryLocator),
       _attribute_name(attribute_name),
       _descending(descending),
       _diversity_attribute(diversity_attribute),

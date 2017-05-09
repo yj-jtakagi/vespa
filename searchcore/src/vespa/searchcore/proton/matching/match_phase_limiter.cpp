@@ -68,6 +68,7 @@ LimitedSearch::visitMembers(vespalib::ObjectVisitor &visitor) const
 }
 
 MatchPhaseLimiter::MatchPhaseLimiter(uint32_t docIdLimit,
+                                     const RangeQueryLocator & rangeQueryLocator,
                                      Searchable &searchable_attributes,
                                      IRequestContext & requestContext,
                                      const vespalib::string &attribute_name,
@@ -81,11 +82,13 @@ MatchPhaseLimiter::MatchPhaseLimiter(uint32_t docIdLimit,
     : _postFilterMultiplier(postFilterMultiplier),
       _maxFilterCoverage(max_filter_coverage),
       _calculator(max_hits, diversity_min_groups, samplePercentage),
-      _limiter_factory(searchable_attributes, requestContext, attribute_name, descending,
+      _limiter_factory(rangeQueryLocator,searchable_attributes, requestContext, attribute_name, descending,
                        diversity_attribute, diversify_cutoff_factor, diversity_cutoff_strategy),
       _coverage(docIdLimit)
 {
 }
+
+MatchPhaseLimiter::~MatchPhaseLimiter() {}
 
 namespace {
 

@@ -12,6 +12,28 @@
 
 namespace proton::matching {
 
+class RangeLimitMetaInfo {
+public:
+    RangeLimitMetaInfo();
+    RangeLimitMetaInfo(vespalib::stringref low, vespalib::stringref high, size_t estimate);
+    ~RangeLimitMetaInfo();
+    const vespalib::string & low() const { return _low; }
+    const vespalib::string & high() const { return _high; }
+    bool valid() const { return _valid; }
+    size_t estimate() const { return _estimate; }
+private:
+    bool _valid;
+    size_t _estimate;
+    vespalib::string _low;
+    vespalib::string _high;
+};
+
+class RangeQueryLocator {
+public:
+    virtual ~RangeQueryLocator() {}
+    virtual RangeLimitMetaInfo locate(vespalib::stringref field) const = 0;
+};
+
 /**
  * This class is responsible for creating attribute-based search
  * iterators that are used to limit the search space. Each search
@@ -24,7 +46,8 @@ class AttributeLimiter
 {
 public:
     enum DiversityCutoffStrategy { LOOSE, STRICT};
-    AttributeLimiter(search::queryeval::Searchable &searchable_attributes,
+    AttributeLimiter(const RangeQueryLocator & _rangeQueryLocator,
+                     search::queryeval::Searchable &searchable_attributes,
                      const search::queryeval::IRequestContext & requestContext,
                      const vespalib::string &attribute_name, bool descending,
                      const vespalib::string &diversity_attribute,
@@ -39,6 +62,7 @@ private:
     const vespalib::string & toString(DiversityCutoffStrategy strategy);
     search::queryeval::Searchable            & _searchable_attributes;
     const search::queryeval::IRequestContext & _requestContext;
+    const RangeQueryLocator                  & _rangeQueryLocator;
     vespalib::string                           _attribute_name;
     bool                                       _descending;
     vespalib::string                           _diversity_attribute;

@@ -97,8 +97,10 @@ private:
     AttributeLimiter          _limiter_factory;
     Coverage                  _coverage;
 
+
 public:
     MatchPhaseLimiter(uint32_t docIdLimit,
+                      const RangeQueryLocator & rangeQueryLocator,
                       search::queryeval::Searchable &searchable_attributes,
                       search::queryeval::IRequestContext & requestContext,
                       const vespalib::string &attribute_name,
@@ -109,6 +111,7 @@ public:
                       uint32_t diversity_min_groups,
                       double diversify_cutoff_factor,
                       AttributeLimiter::DiversityCutoffStrategy diversity_cutoff_strategy);
+    ~MatchPhaseLimiter();
     bool is_enabled() const override { return true; }
     bool was_limited() const override { return _limiter_factory.was_used(); }
     size_t sample_hits_per_thread(size_t num_threads) const override {

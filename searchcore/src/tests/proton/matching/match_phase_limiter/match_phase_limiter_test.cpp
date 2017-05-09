@@ -84,6 +84,16 @@ struct MockSearchable : Searchable {
     }
 };
 
+class MockRangeLocator : public RangeQueryLocator {
+public:
+    RangeLimitMetaInfo locate(vespalib::stringref field) const override {
+        (void) field;
+        return RangeLimitMetaInfo();
+    }
+
+public:
+};
+
 //-----------------------------------------------------------------------------
 
 TEST("require that match phase limit calculator gives expert values") {
@@ -154,12 +164,13 @@ TEST("require that max group size is calculated correctly") {
 
 TEST("require that the attribute limiter works correctly") {
     FakeRequestContext requestContext;
+    MockRangeLocator rangeLocator;
     for (int i = 0; i <= 7; ++i) {
         bool descending = (i & 1) != 0;
         bool strict     = (i & 2) != 0;
         bool diverse    = (i & 4) != 0;
         MockSearchable searchable;
-        AttributeLimiter limiter(searchable, requestContext, "limiter_attribute", descending, "category", 10.0, AttributeLimiter::LOOSE);
+        AttributeLimiter limiter(rangeLocator, searchable, requestContext, "limiter_attribute", descending, "category", 10.0, AttributeLimiter::LOOSE);
         EXPECT_EQUAL(0u, searchable.create_cnt);
         EXPECT_FALSE(limiter.was_used());
         SearchIterator::UP s1 = limiter.create_search(42, diverse ? 3 : 42, strict);
@@ -209,7 +220,8 @@ TEST("require that no limiter has no behavior") {
 TEST("require that the match phase limiter may chose not to limit the query") {
     FakeRequestContext requestContext;
     MockSearchable searchable;
-    MatchPhaseLimiter yes_limiter(10000, searchable, requestContext, "limiter_attribute", 1000, true, 1.0, 0.2, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE);
+    MockRangeLocator rangeLocator;
+    MatchPhaseLimiter yes_limiter(10000, rangeLocator, searchable, requestContext, "limiter_attribute", 1000, true, 1.0, 0.2, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE);
     MaybeMatchPhaseLimiter &limiter = yes_limiter;
     EXPECT_TRUE(limiter.is_enabled());
     EXPECT_EQUAL(20u, limiter.sample_hits_per_thread(10));
@@ -227,9 +239,11 @@ struct MaxFilterCoverageLimiterFixture {
 
     FakeRequestContext requestContext;
     MockSearchable searchable;
+    MockRangeLocator rangeLocator;
+
 
     MatchPhaseLimiter::UP getMaxFilterCoverageLimiter() {
-        MatchPhaseLimiter::UP yes_limiter(new MatchPhaseLimiter(10000, searchable, requestContext, "limiter_attribute", 10000, true, 0.05, 1.0, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE));
+        MatchPhaseLimiter::UP yes_limiter(new MatchPhaseLimiter(10000,rangeLocator, searchable, requestContext, "limiter_attribute", 10000, true, 0.05, 1.0, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE));
         MaybeMatchPhaseLimiter &limiter = *yes_limiter;
         EXPECT_TRUE(limiter.is_enabled());
         EXPECT_EQUAL(1000u, limiter.sample_hits_per_thread(10));
@@ -271,7 +285,8 @@ TEST_F("require that the match phase limiter may chose to limit the query even w
 TEST("require that the match phase limiter is able to pre-limit the query") {
     FakeRequestContext requestContext;
     MockSearchable searchable;
-    MatchPhaseLimiter yes_limiter(10000, searchable, requestContext, "limiter_attribute", 500, true, 1.0, 0.2, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE);
+    MockRangeLocator rangeLocator;
+    MatchPhaseLimiter yes_limiter(10000, rangeLocator, searchable, requestContext, "limiter_attribute", 500, true, 1.0, 0.2, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE);
     MaybeMatchPhaseLimiter &limiter = yes_limiter;
     EXPECT_TRUE(limiter.is_enabled());
     EXPECT_EQUAL(12u, limiter.sample_hits_per_thread(10));
@@ -300,8 +315,9 @@ TEST("require that the match phase limiter is able to pre-limit the query") {
 
 TEST("require that the match phase limiter is able to post-limit the query") {
     MockSearchable searchable;
+    MockRangeLocator rangeLocator;
     FakeRequestContext requestContext;
-    MatchPhaseLimiter yes_limiter(10000, searchable, requestContext,"limiter_attribute", 1500, true, 1.0, 0.2, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE);
+    MatchPhaseLimiter yes_limiter(10000, rangeLocator, searchable, requestContext,"limiter_attribute", 1500, true, 1.0, 0.2, 1.0, "", 1, 10.0, AttributeLimiter::LOOSE);
     MaybeMatchPhaseLimiter &limiter = yes_limiter;
     EXPECT_TRUE(limiter.is_enabled());
     EXPECT_EQUAL(30u, limiter.sample_hits_per_thread(10));
@@ -330,8 +346,9 @@ TEST("require that the match phase limiter is able to post-limit the query") {
 void verifyDiversity(AttributeLimiter::DiversityCutoffStrategy strategy)
 {
     MockSearchable searchable;
+    MockRangeLocator rangeLocator;
     FakeRequestContext requestContext;
-    MatchPhaseLimiter yes_limiter(10000, searchable, requestContext,"limiter_attribute", 500, true, 1.0, 0.2, 1.0, "category", 10, 13.1, strategy);
+    MatchPhaseLimiter yes_limiter(10000, rangeLocator, searchable, requestContext,"limiter_attribute", 500, true, 1.0, 0.2, 1.0, "category", 10, 13.1, strategy);
     MaybeMatchPhaseLimiter &limiter = yes_limiter;
     SearchIterator::UP search = limiter.maybe_limit(prepare(new MockSearch("search")), 0.1, 100000);
     limiter.updateDocIdSpaceEstimate(1000, 9000);

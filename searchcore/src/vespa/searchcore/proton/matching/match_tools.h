@@ -68,7 +68,7 @@ public:
     void setup_dump();
 };
 
-class MatchToolsFactory : public vespalib::noncopyable
+class MatchToolsFactory : public RangeQueryLocator
 {
 private:
     QueryLimiter                  & _queryLimiter;
@@ -82,7 +82,9 @@ private:
     const search::fef::Properties & _featureOverrides;
     bool                            _valid;
 public:
-    typedef std::unique_ptr<MatchToolsFactory> UP;
+    using UP = std::unique_ptr<MatchToolsFactory>;
+    MatchToolsFactory(const MatchToolsFactory &) = delete;
+    MatchToolsFactory & operator=(const MatchToolsFactory &) = delete;
 
     MatchToolsFactory(QueryLimiter & queryLimiter,
                       const vespalib::Doom & softDoom,
@@ -103,6 +105,7 @@ public:
     MatchTools::UP createMatchTools() const;
     search::queryeval::Blueprint::HitEstimate estimate() const { return _query.estimate(); }
     bool has_first_phase_rank() const { return !_rankSetup.getFirstPhaseRank().empty(); }
+    RangeLimitMetaInfo locate(vespalib::stringref field) const override;
 };
 
 }

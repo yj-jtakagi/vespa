@@ -165,16 +165,18 @@ MatchToolsFactory(QueryLimiter               & queryLimiter,
         double diversity_cutoff_factor = DiversityCutoffFactor::lookup(rankProperties);
         vespalib::string diversity_cutoff_strategy = DiversityCutoffStrategy::lookup(rankProperties);
         if (!limit_attribute.empty() && limit_maxhits > 0) {
-            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), searchContext.getAttributes(), _requestContext,
+            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), *this,
+                            searchContext.getAttributes(), _requestContext,
                             limit_attribute, limit_maxhits, !limit_ascending, limit_max_filter_coverage,
                             samplePercentage, postFilterMultiplier,
                             diversity_attribute, diversity_min_groups,
                             diversity_cutoff_factor,
                             AttributeLimiter::toDiversityCutoffStrategy(diversity_cutoff_strategy)));
         } else if (_rankSetup.hasMatchPhaseDegradation()) {
-            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), searchContext.getAttributes(), _requestContext,
-                            _rankSetup.getDegradationAttribute(), _rankSetup.getDegradationMaxHits(), !_rankSetup.isDegradationOrderAscending(),
-                            _rankSetup.getDegradationMaxFilterCoverage(),
+            _match_limiter.reset(new MatchPhaseLimiter(metaStore.getCommittedDocIdLimit(), *this,
+                            searchContext.getAttributes(), _requestContext,
+                            _rankSetup.getDegradationAttribute(), _rankSetup.getDegradationMaxHits(),
+                            !_rankSetup.isDegradationOrderAscending(), _rankSetup.getDegradationMaxFilterCoverage(),
                             _rankSetup.getDegradationSamplePercentage(), _rankSetup.getDegradationPostFilterMultiplier(),
                             _rankSetup.getDiversityAttribute(), _rankSetup.getDiversityMinGroups(),
                             _rankSetup.getDiversityCutoffFactor(),
@@ -195,6 +197,11 @@ MatchToolsFactory::createMatchTools() const
     return MatchTools::UP(
             new MatchTools(_queryLimiter, _requestContext.getSoftDoom(), _hardDoom, _query, *_match_limiter, _queryEnv,
                            _mdl, _rankSetup, _featureOverrides));
+}
+
+RangeLimitMetaInfo MatchToolsFactory::locate(vespalib::stringref field) const {
+    (void) field;
+    return RangeLimitMetaInfo();
 }
 
 }
