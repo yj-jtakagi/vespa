@@ -191,7 +191,7 @@ public:
 
     bool should_use() const { return _should_use; }
 
-    virtual SearchIterator::UP
+    SearchIterator::UP
     createLeafSearch(const TermFieldMatchDataArray &tfmda, bool strict) const override
     {
         std::vector<SearchIterator *> children;
@@ -206,7 +206,7 @@ public:
         }
     }
 
-    virtual void fetchPostings(bool strict) override {
+    void fetchPostings(bool strict) override {
         for (size_t i(0); i < _rangeSearches.size(); i++) {
             _rangeSearches[i]->fetchPostings(strict);
         }
@@ -237,9 +237,7 @@ public:
 
     const search::common::Location &location() const { return _location; }
 
-    virtual SearchIterator::UP
-    createLeafSearch(const TermFieldMatchDataArray &, bool strict) const override
-    {
+    SearchIterator::UP createLeafSearch(const TermFieldMatchDataArray &, bool strict) const override {
         unsigned int num_docs = _attribute.getNumDocs();
         return SearchIterator::UP(FastS_AllocLocationIterator(num_docs, strict, _location));
     }
@@ -247,7 +245,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
-Blueprint::UP make_location_blueprint(const FieldSpec &field, const IAttributeVector &attribute, const Location &loc) {
+Blueprint::UP
+make_location_blueprint(const FieldSpec &field, const IAttributeVector &attribute, const Location &loc) {
     LocationPostFilterBlueprint *post_filter = new LocationPostFilterBlueprint(field, attribute, loc);
     Blueprint::UP post_filter_bp(post_filter);
     const search::common::Location &location = post_filter->location();
@@ -311,8 +310,7 @@ public:
         }
     }
 
-    SearchIterator::UP createLeafSearch(const TermFieldMatchDataArray &tfmda, bool) const override
-    {
+    SearchIterator::UP createLeafSearch(const TermFieldMatchDataArray &tfmda, bool) const override {
         assert(tfmda.size() == 1);
         if (_terms.size() == 0) {
             return SearchIterator::UP(new search::queryeval::EmptySearch());
@@ -428,7 +426,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
-bool check_valid_diversity_attr(const IAttributeVector *attr) {
+bool
+check_valid_diversity_attr(const IAttributeVector *attr) {
     if (attr == nullptr) {
         return false;
     }
