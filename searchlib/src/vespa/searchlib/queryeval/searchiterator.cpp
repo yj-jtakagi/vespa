@@ -2,10 +2,10 @@
 
 #include "searchiterator.h"
 #include <vespa/searchlib/index/docidandfeatures.h>
+#include <vespa/searchlib/common/bitvector.h>
 #include <vespa/vespalib/objects/objectdumper.h>
 #include <vespa/vespalib/objects/visit.h>
 #include <vespa/vespalib/util/classname.h>
-#include <vespa/searchlib/common/bitvector.h>
 
 namespace search {
 namespace queryeval {

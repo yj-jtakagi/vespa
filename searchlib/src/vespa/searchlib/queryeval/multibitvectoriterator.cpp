@@ -1,15 +1,10 @@
 // Copyright 2017 Yahoo Holdings. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
 
-#include <vespa/searchlib/queryeval/multibitvectoriterator.h>
-#include <vespa/searchlib/queryeval/andsearch.h>
-#include <vespa/searchlib/queryeval/andnotsearch.h>
-#include <vespa/searchlib/queryeval/sourceblendersearch.h>
-#include <vespa/searchlib/queryeval/orsearch.h>
+#include "multibitvectoriterator.h"
+#include "andnotsearch.h"
+#include "sourceblendersearch.h"
 #include <vespa/searchlib/common/bitvectoriterator.h>
-#include <vespa/searchlib/attribute/attributeiterators.h>
-#include <vespa/searchlib/fef/termfieldmatchdata.h>
-#include <vespa/searchlib/fef/termfieldmatchdataarray.h>
-#include <vespa/vespalib/util/optimized.h>
+
 
 namespace search {
 namespace queryeval {

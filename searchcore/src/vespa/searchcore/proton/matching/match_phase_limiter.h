@@ -4,11 +4,10 @@
 
 #include "match_phase_limit_calculator.h"
 #include "attribute_limiter.h"
-
 #include <vespa/searchlib/queryeval/searchable.h>
-#include <vespa/vespalib/stllike/string.h>
 #include <vespa/searchlib/queryeval/searchiterator.h>
 #include <vespa/searchlib/queryeval/blueprint.h>
+#include <vespa/vespalib/util/sync.h>
 #include <atomic>
 
 namespace proton {

@@ -2,8 +2,8 @@
 
 #include "match_phase_limiter.h"
 #include <vespa/searchlib/queryeval/andsearchstrict.h>
-#include <vespa/log/log.h>
 
+#include <vespa/log/log.h>
 LOG_SETUP(".proton.matching.match_phase_limiter");
 
 using search::queryeval::SearchIterator;
