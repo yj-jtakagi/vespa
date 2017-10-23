@@ -54,8 +54,11 @@ T computeDotProduct(const T * af, const T * bf, size_t sz)
             partial[j] += a[VectorsPerChunk*i+j] * b[VectorsPerChunk*i+j];
         }
     }
+    for (size_t i(numChunks*VectorsPerChunk); i < sz*sizeof(T)/VLEN; i++) {
+        partial[0] += a[i] * b[i];
+    }
     T sum(0);
-    for (size_t i(numChunks*ChunkSize); i < sz; i++) {
+    for (size_t i = (sz/(VLEN/sizeof(T)))*(VLEN/sizeof(T)); i < sz; i++) {
         sum += af[i] * bf[i];
     }
     partial[0] = sumR<V, VectorsPerChunk>(partial);
