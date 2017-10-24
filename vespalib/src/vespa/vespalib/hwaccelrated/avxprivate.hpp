@@ -22,15 +22,49 @@ T sumT(const V & v) {
     return sum;
 }
 
-template <typename T, size_t C>
-T sumR(const T * v) {
+template <typename R, typename T, size_t C>
+R sumR(const T * v) {
     if (C == 1) {
-        return v[0];
+        return v[0].v;
     } else if (C == 2) {
-        return v[0] + v[1];
+        return v[0].v + v[1].v;
     } else {
-        return sumR<T, C/2>(v) + sumR<T, C/2>(v+C/2);
+        return sumR<R, T, C/2>(v) + sumR<R, T, C/2>(v+C/2);
     }
+}
+
+template <typename T, size_t N>
+union U;
+
+template <typename T>
+union U<T, 64u> {
+    T __attribute__((vector_size(64)))  v;
+    T __attribute__((vector_size(32)))  v2[2];
+    T __attribute__((vector_size(16)))  v4[4];
+};
+
+template <typename T>
+union U<T, 32u> {
+    T __attribute__((vector_size(32)))  v;
+    T __attribute__((vector_size(16)))  v2[2];
+};
+
+template <typename T, typename UV>
+T sumU(const UV & v) {
+    return sumT<T>(v.v);
+};
+
+template <typename T>
+T sumU(U<T, 64u> & v) {
+    v.v2[0] += v.v2[1];
+    v.v4[0] += v.v4[1];
+    return sumT<T>(v.v4[0]);
+}
+
+template <typename T>
+T sumU(U<T, 32u> & v) {
+    v.v2[0] += v.v2[1];
+    return sumT<T>(v.v2[0]);
 }
 
 template <typename T, size_t VLEN, unsigned AlignA, unsigned AlignB, size_t VectorsPerChunk>
@@ -41,9 +75,10 @@ T computeDotProduct(const T * af, const T * bf, size_t sz)
 {
     constexpr const size_t ChunkSize = VLEN*VectorsPerChunk/sizeof(T);
     typedef T V __attribute__ ((vector_size (VLEN)));
+    using UV = U<T, VLEN>;
     typedef T A __attribute__ ((vector_size (VLEN), aligned(AlignA)));
     typedef T B __attribute__ ((vector_size (VLEN), aligned(AlignB)));
-    V partial[VectorsPerChunk];
+    UV partial[VectorsPerChunk];
     memset(partial, 0, sizeof(partial));
     const A * a = reinterpret_cast<const A *>(af);
     const B * b = reinterpret_cast<const B *>(bf);
@@ -51,19 +86,19 @@ T computeDotProduct(const T * af, const T * bf, size_t sz)
     const size_t numChunks(sz/ChunkSize);
     for (size_t i(0); i < numChunks; i++) {
         for (size_t j(0); j < VectorsPerChunk; j++) {
-            partial[j] += a[VectorsPerChunk*i+j] * b[VectorsPerChunk*i+j];
+            partial[j].v += a[VectorsPerChunk*i+j] * b[VectorsPerChunk*i+j];
         }
     }
     for (size_t i(numChunks*VectorsPerChunk); i < sz*sizeof(T)/VLEN; i++) {
-        partial[0] += a[i] * b[i];
+        partial[0].v += a[i] * b[i];
     }
     T sum(0);
     for (size_t i = (sz/(VLEN/sizeof(T)))*(VLEN/sizeof(T)); i < sz; i++) {
         sum += af[i] * bf[i];
     }
-    partial[0] = sumR<V, VectorsPerChunk>(partial);
+    partial[0].v = sumR<V, UV, VectorsPerChunk>(partial);
 
-    return sum + sumT<T, V>(partial[0]);
+    return sum + sumU<T>(partial[0]);
 }
 
 }
