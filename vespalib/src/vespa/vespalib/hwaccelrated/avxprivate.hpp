@@ -89,8 +89,15 @@ T computeDotProduct(const T * af, const T * bf, size_t sz)
             partial[j].v += a[VectorsPerChunk*i+j] * b[VectorsPerChunk*i+j];
         }
     }
-    for (size_t i(numChunks*VectorsPerChunk); i < sz*sizeof(T)/VLEN; i++) {
-        partial[0].v += a[i] * b[i];
+    const size_t indexV = numChunks*VectorsPerChunk;
+    const size_t residueV(sz*sizeof(T)/VLEN - indexV);
+    switch (residueV) {
+        case 3:
+            partial[2].v += a[indexV+2] * b[indexV+2];
+        case 2:
+            partial[1].v += a[indexV+1] * b[indexV+1];
+        case 1:
+            partial[0].v += a[indexV] * b[indexV];
     }
     T sum(0);
     for (size_t i = (sz/(VLEN/sizeof(T)))*(VLEN/sizeof(T)); i < sz; i++) {
