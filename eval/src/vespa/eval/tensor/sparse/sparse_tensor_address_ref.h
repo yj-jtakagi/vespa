@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <vector>
 #include <vespa/vespalib/util/stash.h>
 #include <vespa/vespalib/xxhash/xxhash.h>
+#include <cstring>
 
 namespace vespalib::tensor {
 
