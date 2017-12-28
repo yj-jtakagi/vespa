@@ -76,12 +76,12 @@ void
 SparseTensorMatch::fastMatch(const TensorImplType &lhs, const TensorImplType &rhs)
 {
     _builder.reserve(lhs.cells().size());
-    for (const auto &lhsCell : lhs.cells()) {
-        auto rhsItr = rhs.cells().find(lhsCell.first);
-        if (rhsItr != rhs.cells().end()) {
+    lhs.cells().for_each([this, &rhcells=rhs.cells()] (const auto & lhsCell) {
+        auto rhsItr = rhcells.find(lhsCell.first);
+        if (rhsItr != rhcells.end()) {
             _builder.insertCell(lhsCell.first, lhsCell.second * rhsItr->second);
         }
-    }
+    });
 }
 
 void
