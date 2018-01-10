@@ -292,7 +292,7 @@ public:
     SearchIteratorUP createSearch(fef::MatchData &md, bool strict) const override;
 
     virtual bool getRange(vespalib::string & from, vespalib::string & to) const;
-    virtual SearchIterator::UP createLeafSearch(const fef::TermFieldMatchDataArray &tfmda, bool strict) const = 0;
+    virtual std::unique_ptr<SearchIterator> createLeafSearch(const fef::TermFieldMatchDataArray &tfmda, bool strict) const = 0;
 };
 
 // for leaf nodes representing a single term
