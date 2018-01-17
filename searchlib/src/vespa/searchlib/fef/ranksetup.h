@@ -8,8 +8,7 @@
 #include "blueprintresolver.h"
 #include "rank_program.h"
 
-namespace search {
-namespace fef {
+namespace search::fef {
 
 /**
  * A rank setup contains information about how initial and final rank
@@ -22,6 +21,8 @@ namespace fef {
  **/
 class RankSetup
 {
+public:
+    using Errors = BlueprintResolver::Errors;
 private:
     const BlueprintFactory  &_factory;
     const IIndexEnvironment &_indexEnv;
@@ -47,6 +48,7 @@ private:
     feature_t                _rankScoreDropLimit;
     std::vector<vespalib::string> _summaryFeatures;
     std::vector<vespalib::string> _dumpFeatures;
+    Errors                   _compileErrors;
     bool                     _ignoreDefaultRankFeatures;
     bool                     _compiled;
     bool                     _compileError;
@@ -60,6 +62,7 @@ private:
     double                   _softTimeoutFactor;
 
 
+    void compileAndCheckForErrors(BlueprintResolver &bp);
 public:
     RankSetup(const RankSetup &) = delete;
     RankSetup &operator=(const RankSetup &) = delete;
@@ -385,6 +388,12 @@ public:
      **/
     bool compile();
 
+    /**
+     * Will return any accumulated errors during compile
+     * @return list of errors
+     */
+    const Errors & getCompileErrors() const { return _compileErrors; }
+
     // These functions create rank programs for different tasks. Note
     // that the setup function must be called on rank programs for
     // them to be ready to use. Also keep in mind that creating a rank
@@ -403,5 +412,4 @@ public:
     void prepareSharedState(const IQueryEnvironment & queryEnv, IObjectStore & objectStore) const;
 };
 
-} // namespace fef
-} // namespace search
+}
