@@ -446,7 +446,7 @@ SearchContextTest::performSearch(const V & vec, const T & term, QueryTermSimple:
 {
     TermFieldMatchData dummy;
     SearchContextPtr sc = getSearch(vec, term, termType);
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     SearchBasePtr sb = sc->createIterator(&dummy, true);
     ResultSetPtr rs = performSearch(*sb, vec.getNumDocs());
     return rs;
@@ -504,7 +504,7 @@ SearchContextTest::testFind(const PostingList<V, T> & pl)
 {
     { // strict search iterator
         SearchContextPtr sc = getSearch(pl.getAttribute(), pl.getValue());
-        sc->fetchPostings(true);
+        sc->fetchPostings(true, nullptr);
         TermFieldMatchData dummy;
         SearchBasePtr sb = sc->createIterator(&dummy, true);
         ResultSetPtr rs = performSearch(*sb, pl.getAttribute().getNumDocs());
@@ -644,7 +644,7 @@ Verifier<T, A>::Verifier(T key, const vespalib::string & keyAsString, const vesp
     _attribute->commit(true);
     _sc = SearchContextTest::getSearch(*_attribute, keyAsString);
     ASSERT_TRUE(_sc->valid());
-    _sc->fetchPostings(true);
+    _sc->fetchPostings(true, nullptr);
 }
 
 template<typename T, typename A>
@@ -721,7 +721,7 @@ SearchContextTest::testStrictSearchIterator(SearchContext & threeHits,
 {
     TermFieldMatchData dummy;
     { // search for value with 3 hits
-        threeHits.fetchPostings(true);
+        threeHits.fetchPostings(true, nullptr);
         SearchBasePtr sb = threeHits.createIterator(&dummy, true);
         sb->initRange(1, threeHits.attribute().getCommittedDocIdLimit());
         EXPECT_TRUE(typeTester.matches(*sb));
@@ -742,7 +742,7 @@ SearchContextTest::testStrictSearchIterator(SearchContext & threeHits,
     }
 
     { // search for value with no hits
-        noHits.fetchPostings(true);
+        noHits.fetchPostings(true, nullptr);
         SearchBasePtr sb = noHits.createIterator(&dummy, true);
         sb->initRange(1, noHits.attribute().getCommittedDocIdLimit());
         ASSERT_TRUE(typeTester.matches(*sb));
@@ -760,7 +760,7 @@ SearchContextTest::testNonStrictSearchIterator(SearchContext & threeHits,
 {
     TermFieldMatchData dummy;
     { // search for value with three hits
-        threeHits.fetchPostings(false);
+        threeHits.fetchPostings(false, nullptr);
         SearchBasePtr sb = threeHits.createIterator(&dummy, false);
         sb->initRange(1, threeHits.attribute().getCommittedDocIdLimit());
         EXPECT_TRUE(typeTester.matches(*sb));
@@ -778,7 +778,7 @@ SearchContextTest::testNonStrictSearchIterator(SearchContext & threeHits,
         EXPECT_TRUE(sb->getDocId() == 5u || sb->isAtEnd());
     }
     { // search for value with no hits
-        noHits.fetchPostings(false);
+        noHits.fetchPostings(false, nullptr);
         SearchBasePtr sb = noHits.createIterator(&dummy, false);
         sb->initRange(1, threeHits.attribute().getCommittedDocIdLimit());
 
@@ -950,7 +950,7 @@ SearchContextTest::testSearchIteratorUnpacking(const AttributePtr & attr,
     pos.setElementWeight(100);
     md.appendPosition(pos);
 
-    sc.fetchPostings(strict);
+    sc.fetchPostings(strict, nullptr);
     SearchBasePtr sb = sc.createIterator(&md, strict);
     sb->initFullRange();
 

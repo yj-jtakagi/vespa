@@ -317,7 +317,7 @@ Fixture::readWork(uint32_t cnt)
         } else {
             ++nonEmptyCount;
         }
-        result->fetchPostings(true);
+        result->fetchPostings(true, nullptr);
         SearchIterator::UP search = result->createSearch(*match_data, true);
         if (!EXPECT_TRUE(search.get() != 0)) {
             LOG(error, "Did not get search iterator");
@@ -412,7 +412,7 @@ verifyResult(const FakeResult &expect,
     EXPECT_EQUAL(expect.inspect().size(), result->getState().estimate().estHits);
     EXPECT_EQUAL(expect.inspect().empty(), result->getState().estimate().empty);
 
-    result->fetchPostings(true);
+    result->fetchPostings(true, nullptr);
     SearchIterator::UP search = result->createSearch(*match_data, true);
     if (!EXPECT_TRUE(search.get() != 0)) {
         return false;

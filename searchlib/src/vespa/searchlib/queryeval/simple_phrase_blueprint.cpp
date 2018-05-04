@@ -7,8 +7,7 @@
 #include <algorithm>
 #include <map>
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 SimplePhraseBlueprint::SimplePhraseBlueprint(const FieldSpec &field, const IRequestContext & requestContext)
     : ComplexLeafBlueprint(field),
@@ -82,10 +81,10 @@ SimplePhraseBlueprint::createLeafSearch(const search::fef::TermFieldMatchDataArr
 
 
 void
-SimplePhraseBlueprint::fetchPostings(bool strict)
+SimplePhraseBlueprint::fetchPostings(bool strict, const BitVector * filter)
 {
     for (size_t i = 0; i < _terms.size(); ++i) {
-        _terms[i]->fetchPostings(strict);
+        _terms[i]->fetchPostings(strict, filter);
     }
 }
 
@@ -96,5 +95,4 @@ SimplePhraseBlueprint::visitMembers(vespalib::ObjectVisitor &visitor) const
     visit(visitor, "terms", _terms);
 }
 
-}  // namespace search::queryeval
-}  // namespace search
+}

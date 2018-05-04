@@ -20,8 +20,7 @@ using std::vector;
 using vespalib::string;
 using namespace search::predicate;
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 namespace {
 typedef PredicateBlueprint::IntervalEntry IntervalEntry;
@@ -204,7 +203,7 @@ PredicateBlueprint::PredicateBlueprint(const FieldSpecBase &field,
     }
 }
 
-PredicateBlueprint::~PredicateBlueprint() {}
+PredicateBlueprint::~PredicateBlueprint() = default;
 
 namespace {
 
@@ -228,7 +227,7 @@ namespace {
 
 }
 
-void PredicateBlueprint::fetchPostings(bool) {
+void PredicateBlueprint::fetchPostings(bool, const BitVector *) {
     const auto &interval_index = _index.getIntervalIndex();
     const auto &bounds_index = _index.getBoundsIndex();
     lookupPostingLists(_interval_dict_entries, _interval_vector_iterators,
@@ -339,5 +338,5 @@ std::vector<PredicatePostingList::UP> PredicateBlueprint::createPostingLists() c
     }
     return posting_lists;
 }
-}  // namespace search::queryeval
-}  // namespace search
+
+}

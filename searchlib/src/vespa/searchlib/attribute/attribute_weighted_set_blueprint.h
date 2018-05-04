@@ -30,7 +30,7 @@ public:
     ~AttributeWeightedSetBlueprint();
     void addToken(std::unique_ptr<ISearchContext> context, int32_t weight);
     queryeval::SearchIterator::UP createLeafSearch(const fef::TermFieldMatchDataArray &tfmda, bool strict) const override;
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
 };
 
 } // namespace search

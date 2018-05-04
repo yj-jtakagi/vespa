@@ -7,11 +7,7 @@
 #include "ipostinglistsearchcontext.h"
 #include <vespa/searchlib/queryeval/searchiterator.h>
 
-namespace search
-{
-
-namespace attribute
-{
+namespace search::attribute {
 
 /**
  * Search context helper for enumerated attributes, used to eliminate
@@ -38,12 +34,8 @@ protected:
     queryeval::SearchIterator::UP
     createPostingIterator(fef::TermFieldMatchData *matchData, bool strict) override;
 
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
     unsigned int approximateHits() const override;
 };
 
-
-} // namespace attribute
-
-} // namespace search
-
+}

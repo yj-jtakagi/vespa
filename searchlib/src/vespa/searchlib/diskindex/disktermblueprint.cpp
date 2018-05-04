@@ -56,9 +56,9 @@ namespace {
 bool
 areAnyParentsEquiv(const Blueprint * node)
 {
-    return (node == NULL)
+    return (node == nullptr)
            ? false
-           : (dynamic_cast<const EquivBlueprint *>(node) != NULL)
+           : (dynamic_cast<const EquivBlueprint *>(node) != nullptr)
              ? true
              : areAnyParentsEquiv(node->getParent());
 }
@@ -66,12 +66,13 @@ areAnyParentsEquiv(const Blueprint * node)
 }
 
 void
-DiskTermBlueprint::fetchPostings(bool strict)
+DiskTermBlueprint::fetchPostings(bool strict, const BitVector * filter)
 {
     (void) strict;
+    (void) filter;
     _hasEquivParent = areAnyParentsEquiv(getParent());
     _bitVector = _diskIndex.readBitVector(*_lookupRes);
-    if (!_useBitVector || (_bitVector.get() == NULL)) {
+    if (!_useBitVector || (_bitVector.get() == nullptr)) {
         _postingHandle = _diskIndex.readPostingList(*_lookupRes);
     }
     _fetchPostingsDone = true;

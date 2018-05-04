@@ -153,7 +153,7 @@ struct WS {
         Node::UP node = createNode();
         FieldSpecList fields = FieldSpecList().add(FieldSpec(field, fieldId, handle));
         queryeval::Blueprint::UP bp = searchable.createBlueprint(requestContext, fields, *node);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP sb = bp->createSearch(*md, strict);
         return (dynamic_cast<WeightedSetTermSearch*>(sb.get()) != 0);
     }
@@ -165,7 +165,7 @@ struct WS {
         Node::UP node = createNode();
         FieldSpecList fields = FieldSpecList().add(FieldSpec(field, fieldId, handle));
         queryeval::Blueprint::UP bp = searchable.createBlueprint(requestContext, fields, *node);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP sb = bp->createSearch(*md, strict);
         FakeResult result;
         sb->initRange(1, 10);

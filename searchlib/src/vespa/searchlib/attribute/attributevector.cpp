@@ -73,7 +73,7 @@ AttributeVector::BaseName::BaseName(const vespalib::stringref &base,
     append(name);
 }
 
-AttributeVector::BaseName::~BaseName() { }
+AttributeVector::BaseName::~BaseName() = default;
 
 
 AttributeVector::BaseName::string
@@ -183,7 +183,7 @@ AttributeVector::AttributeVector(const vespalib::stringref &baseFileName, const 
 { }
 
 
-AttributeVector::~AttributeVector() { }
+AttributeVector::~AttributeVector() = default;
 
 void AttributeVector::updateStat(bool force) {
     if (force) {
@@ -585,7 +585,7 @@ AttributeVector::createSearchContext(QueryTermSimpleUP term,
     return getSearch(std::move(term), params);
 }
 
-AttributeVector::SearchContext::~SearchContext() { }
+AttributeVector::SearchContext::~SearchContext() = default;
 
 unsigned int
 AttributeVector::SearchContext::approximateHits() const
@@ -633,9 +633,10 @@ createFilterIterator(fef::TermFieldMatchData *matchData, bool strict)
 
 
 void
-AttributeVector::SearchContext::fetchPostings(bool strict) {
-    if (_plsc != NULL)
-        _plsc->fetchPostings(strict);
+AttributeVector::SearchContext::fetchPostings(bool strict, const BitVector * filter) {
+    if (_plsc != nullptr) {
+        _plsc->fetchPostings(strict, filter);
+    }
 }
 
 
@@ -645,8 +646,7 @@ AttributeVector::apply(DocId doc, const MapValueUpdate &map) {
     if (retval) {
         const ValueUpdate & vu(map.getUpdate());
         if (vu.inherits(ArithmeticValueUpdate::classId)) {
-            const ArithmeticValueUpdate &
-                au(static_cast<const ArithmeticValueUpdate &>(vu));
+            const ArithmeticValueUpdate &au(static_cast<const ArithmeticValueUpdate &>(vu));
             retval = applyWeight(doc, map.getKey(), au);
         } else {
             retval = false;

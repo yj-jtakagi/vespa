@@ -144,11 +144,11 @@ public:
     fetchPostings(bool useBlueprint)
     {
         if (useBlueprint) {
-            _phrase.fetchPostings(_strict);
+            _phrase.fetchPostings(_strict, nullptr);
             return;
         }
         for (size_t i = 0; i < _children.size(); ++i) {
-            _children[i]->fetchPostings(_strict);
+            _children[i]->fetchPostings(_strict, nullptr);
         }
     }
 

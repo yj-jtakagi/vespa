@@ -375,7 +375,7 @@ PostingListAttributeTest::assertSearch(const std::string &exp, StringAttribute &
 {
     TermFieldMatchData md;
     SearchContextPtr sc = getSearch<StringAttribute>(sa);
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     SearchBasePtr sb = sc->createIterator(&md, true);
     if (!EXPECT_TRUE(assertIterator(exp, *sb)))
         return false;
@@ -388,7 +388,7 @@ PostingListAttributeTest::assertSearch(const std::string &exp, StringAttribute &
 {
     TermFieldMatchData md;
     SearchContextPtr sc = getSearch<StringAttribute, std::string>(sa, key, false);
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     SearchBasePtr sb = sc->createIterator(&md, true);
     if (!EXPECT_TRUE(assertIterator(exp, *sb, &md)))
         return false;
@@ -400,7 +400,7 @@ PostingListAttributeTest::assertSearch(const std::string &exp, IntegerAttribute 
 {
     TermFieldMatchData md;
     SearchContextPtr sc = getSearch<IntegerAttribute, int32_t>(ia, key, false);
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     SearchBasePtr sb = sc->createIterator(&md, true);
     if (!EXPECT_TRUE(assertIterator(exp, *sb, &md)))
         return false;
@@ -479,7 +479,7 @@ PostingListAttributeTest::checkSearch(bool useBitVector, const AttributeVector &
 {
     SearchContextPtr sc = getSearch(vec, term, false, attribute::SearchContextParams().useBitVector(useBitVector));
     EXPECT_FALSE( ! sc );
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     size_t approx = sc->approximateHits();
     EXPECT_EQUAL(numHits, approx);
     if (docBegin == 0) {
@@ -906,7 +906,7 @@ PostingListAttributeTest::testMinMax(AttributePtr &ptr1, uint32_t trimmed)
 {
     TermFieldMatchData md;
     SearchContextPtr sc = getSearch<VectorType>(as<VectorType>(ptr1));
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     SearchBasePtr sb = sc->createIterator(&md, true);
     sb->initFullRange();
 
@@ -932,7 +932,7 @@ PostingListAttributeTest::testMinMax(AttributePtr &ptr1, uint32_t trimmed)
     EXPECT_EQUAL(1u, sb->getDocId());
 
     sc = getSearch2<VectorType>(as<VectorType>(ptr1));
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     sb = sc->createIterator(&md, true);
     sb->initFullRange();
 

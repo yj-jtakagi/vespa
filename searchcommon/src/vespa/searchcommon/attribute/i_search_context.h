@@ -5,18 +5,15 @@
 #include <vespa/searchcommon/common/range.h>
 #include <vespa/vespalib/stllike/string.h>
 
+
+namespace search::fef { class TermFieldMatchData; }
+namespace search::queryeval { class SearchIterator; }
 namespace search {
-
-namespace fef {
-    class TermFieldMatchData;
-}
-namespace queryeval {
-    class SearchIterator;
+    class QueryTermBase;
+    class BitVector;
 }
 
-class QueryTermBase;
-
-namespace attribute {
+namespace search::attribute {
 
 class ISearchContext {
 public:
@@ -49,8 +46,11 @@ public:
     /*
      * Create temporary posting lists.
      * Should be called before createIterator() is called.
+     * Will load/prepare any postings lists. Will take strictness and optional filter into account.
+     * @param strict If true iterator must advance to next valid docid.
+     * @param filter Any prefilter that can be applied to posting lists for optimization purposes.
      */
-    virtual void fetchPostings(bool strict) = 0;
+    virtual void fetchPostings(bool strict, const BitVector * filter) = 0;
 
     virtual bool valid() const = 0;
     virtual Int64Range getAsIntegerTerm() const = 0;
@@ -62,5 +62,4 @@ public:
 
 };
 
-}
 }

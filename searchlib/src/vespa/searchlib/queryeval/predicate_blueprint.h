@@ -10,10 +10,9 @@
 #include <vector>
 #include <memory>
 
-namespace search {
-namespace query { class PredicateQuery; }
+namespace search::query { class PredicateQuery; }
 
-namespace queryeval {
+namespace search::queryeval {
 /**
  * Blueprint for building predicate searches. It builds search
  * iterators based on PredicateSearch.
@@ -49,11 +48,10 @@ public:
                        const query::PredicateQuery &query);
 
     ~PredicateBlueprint();
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
 
     SearchIterator::UP
-    createLeafSearch(const fef::TermFieldMatchDataArray &tfmda,
-                     bool strict) const override;
+    createLeafSearch(const fef::TermFieldMatchDataArray &tfmda, bool strict) const override;
 private:
     using BTreeIterator = predicate::SimpleIndex<datastore::EntryRef>::BTreeIterator;
     using VectorIterator = predicate::SimpleIndex<datastore::EntryRef>::VectorIterator;
@@ -91,6 +89,4 @@ private:
     optional<VectorIterator> _zstar_vector_iterator;
 };
 
-}  // namespace search::queryeval
-}  // namespace search
-
+}

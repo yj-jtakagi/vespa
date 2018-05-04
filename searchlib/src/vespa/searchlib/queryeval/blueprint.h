@@ -4,12 +4,13 @@
 
 #include "field_spec.h"
 #include "unpackinfo.h"
-#include <vespa/searchlib/fef/handle.h>
-#include <vespa/searchlib/fef/matchdata.h>
-#include <vespa/searchlib/fef/termfieldmatchdata.h>
-#include <vespa/searchlib/fef/termfieldmatchdataarray.h>
 
-namespace vespalib { class ObjectVisitor; };
+namespace vespalib { class ObjectVisitor; }
+namespace search { class BitVector; }
+namespace search::fef {
+    class TermFieldMatchDataArray;
+    class MatchData;
+}
 
 namespace search::queryeval {
 
@@ -165,7 +166,12 @@ public:
 
     double hit_ratio() const { return getState().hit_ratio(_docid_limit); }        
 
-    virtual void fetchPostings(bool strict) = 0;
+    /**
+     * Will load/prepare any postings lists. Will take strictness and optional filter into account.
+     * @param strict If true iterators produced must advance to next valid docid.
+     * @param filter Any prefilter that can be applied to posting lists for optimization purposes.
+     */
+    virtual void fetchPostings(bool strict, const BitVector * filter) = 0;
     virtual void freeze() = 0;
     bool frozen() const { return _frozen; }
 
@@ -264,7 +270,7 @@ public:
                              bool strict, fef::MatchData &md) const = 0;
 
     void visitMembers(vespalib::ObjectVisitor &visitor) const override;
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
     void freeze() override final;
 
     UnpackInfo calculateUnpackInfo(const fef::MatchData & md) const;
@@ -288,12 +294,11 @@ public:
     ~LeafBlueprint();
     const State &getState() const override final { return _state; }
     void setDocIdLimit(uint32_t limit) override final { Blueprint::setDocIdLimit(limit); }
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
     void freeze() override final;
     SearchIteratorUP createSearch(fef::MatchData &md, bool strict) const override;
 
-    virtual SearchIteratorUP createLeafSearch(const fef::TermFieldMatchDataArray &tfmda,
-                                                bool strict) const = 0;
+    virtual SearchIteratorUP createLeafSearch(const fef::TermFieldMatchDataArray &tfmda, bool strict) const = 0;
 };
 
 // for leaf nodes representing a single term

@@ -79,7 +79,7 @@ Test::testTerm()
         bool strict = (i == 0);
         TEST_STATE(strict ? "strict" : "non-strict");
         MatchData::UP md = MatchData::makeTestInstance(100, 10);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP search = bp->createSearch(*md, strict);
         search->initFullRange();
 
@@ -133,7 +133,7 @@ Test::testPhrase()
         bool strict = (i == 0);
         TEST_STATE(strict ? "strict" : "non-strict");
         MatchData::UP md = MatchData::makeTestInstance(100, 10);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP search = bp->createSearch(*md, strict);
         search->initFullRange();
 
@@ -189,7 +189,7 @@ Test::testWeightedSet()
         bool strict = (i == 0);
         TEST_STATE(strict ? "strict" : "non-strict");
         MatchData::UP md = MatchData::makeTestInstance(100, 10);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP search = bp->createSearch(*md, strict);
         search->initFullRange();
 
@@ -265,7 +265,7 @@ Test::testMultiField()
         bool strict = (i == 0);
         TEST_STATE(strict ? "strict" : "non-strict");
         MatchData::UP md = MatchData::makeTestInstance(100, 10);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP search = bp->createSearch(*md, strict);
         search->initFullRange();
 
@@ -354,7 +354,7 @@ Test::testPhraseWithEmptyChild()
         bool strict = (i == 0);
         TEST_STATE(strict ? "strict" : "non-strict");
         MatchData::UP md = MatchData::makeTestInstance(100, 10);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP search = bp->createSearch(*md, strict);
         search->initFullRange();
 

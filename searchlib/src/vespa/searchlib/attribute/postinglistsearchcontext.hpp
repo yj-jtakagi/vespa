@@ -30,7 +30,7 @@ PostingListSearchContextT(const Dictionary &dictionary, uint32_t docIdLimit, uin
 }
 
 template <typename DataT>
-PostingListSearchContextT<DataT>::~PostingListSearchContextT() {}
+PostingListSearchContextT<DataT>::~PostingListSearchContextT() = default;
 
 
 template <typename DataT>
@@ -111,8 +111,9 @@ PostingListSearchContextT<DataT>::fillBitVector()
 
 template <typename DataT>
 void
-PostingListSearchContextT<DataT>::fetchPostings(bool strict)
+PostingListSearchContextT<DataT>::fetchPostings(bool strict, const BitVector * filter)
 {
+    (void) filter;
     assert(!_fetchPostingsDone);
     _fetchPostingsDone = true;
     if (_uniqueValues < 2u) {

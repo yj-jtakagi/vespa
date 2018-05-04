@@ -222,7 +222,7 @@ TEST("testAnd") {
     and_b->addChild(Blueprint::UP(new SimpleBlueprint(a)));
     and_b->addChild(Blueprint::UP(new SimpleBlueprint(b)));
     Blueprint::UP bp(and_b);
-    bp->fetchPostings(true);
+    bp->fetchPostings(true, nullptr);
     SearchIterator::UP and_ab = bp->createSearch(*md, true);
 
     EXPECT_TRUE(dynamic_cast<const AndSearch *>(and_ab.get()) != nullptr);
@@ -250,7 +250,7 @@ TEST("testOr") {
         or_b->addChild(Blueprint::UP(new SimpleBlueprint(a)));
         or_b->addChild(Blueprint::UP(new SimpleBlueprint(b)));
         Blueprint::UP bp(or_b);
-        bp->fetchPostings(true);
+        bp->fetchPostings(true, nullptr);
         SearchIterator::UP or_ab = bp->createSearch(*md, true);
 
         SimpleResult res;
@@ -365,7 +365,7 @@ TEST("testAndNot") {
         andnot_b->addChild(Blueprint::UP(new SimpleBlueprint(a)));
         andnot_b->addChild(Blueprint::UP(new SimpleBlueprint(b)));
         Blueprint::UP bp(andnot_b);
-        bp->fetchPostings(true);
+        bp->fetchPostings(true, nullptr);
         SearchIterator::UP andnot_ab = bp->createSearch(*md, true);
 
         SimpleResult res;
@@ -386,7 +386,7 @@ TEST("testAndNot") {
         andnot_b->addChild(Blueprint::UP(new SimpleBlueprint(a)));
         andnot_b->addChild(Blueprint::UP(new DummySingleValueBitNumericAttributeBlueprint(b)));
         Blueprint::UP bp(andnot_b);
-        bp->fetchPostings(true);
+        bp->fetchPostings(true, nullptr);
         SearchIterator::UP andnot_ab = bp->createSearch(*md, true);
         EXPECT_TRUE(dynamic_cast<const OptimizedAndNotForBlackListing *>(andnot_ab.get()) != NULL);
 
@@ -414,7 +414,7 @@ TEST("testAndNot") {
         and_b->addChild(Blueprint::UP(new SimpleBlueprint(c)));
         and_b->addChild(Blueprint::UP(andnot_b));
         Blueprint::UP bp(and_b);
-        bp->fetchPostings(true);
+        bp->fetchPostings(true, nullptr);
         SearchIterator::UP and_cab = bp->createSearch(*md, true);
 
         SimpleResult res;
@@ -440,7 +440,7 @@ TEST("testRank") {
         rank_b->addChild(Blueprint::UP(new SimpleBlueprint(a)));
         rank_b->addChild(Blueprint::UP(new SimpleBlueprint(b)));
         Blueprint::UP bp(rank_b);
-        bp->fetchPostings(true);
+        bp->fetchPostings(true, nullptr);
         SearchIterator::UP rank_ab = bp->createSearch(*md, true);
 
         SimpleResult res;

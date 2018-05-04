@@ -4,6 +4,7 @@
 #include <vespa/searchlib/queryeval/termasstring.h>
 #include <vespa/searchlib/queryeval/andsearchstrict.h>
 #include <vespa/searchlib/queryeval/fake_requestcontext.h>
+#include <vespa/searchlib/fef/termfieldmatchdataarray.h>
 
 using namespace proton::matching;
 using search::queryeval::SearchIterator;
@@ -57,8 +58,8 @@ struct MockBlueprint : SimpleLeafBlueprint {
     {
         setEstimate(HitEstimate(756, false));
     }    
-    virtual SearchIterator::UP createLeafSearch(const TermFieldMatchDataArray &tfmda,
-                                                bool strict) const override
+    SearchIterator::UP createLeafSearch(const TermFieldMatchDataArray &tfmda,
+                                        bool strict) const override
     {
         if (postings_fetched) {
             EXPECT_EQUAL(postings_strict, strict);
@@ -66,7 +67,7 @@ struct MockBlueprint : SimpleLeafBlueprint {
         return SearchIterator::UP(new MockSearch(spec, term, strict, tfmda,
                                                  postings_fetched));
     }
-    virtual void fetchPostings(bool strict) override {
+    void fetchPostings(bool strict, const search::BitVector *) override {
         postings_strict = strict;
         postings_fetched = true;
     }
@@ -74,9 +75,8 @@ struct MockBlueprint : SimpleLeafBlueprint {
 
 struct MockSearchable : Searchable {
     size_t create_cnt = 0;
-    virtual Blueprint::UP createBlueprint(const search::queryeval::IRequestContext & requestContext,
-                                          const FieldSpec &field,
-                                          const search::query::Node &term) override
+    Blueprint::UP createBlueprint(const search::queryeval::IRequestContext & requestContext,
+                                  const FieldSpec &field, const search::query::Node &term) override
     {
         (void) requestContext;
         ++create_cnt;

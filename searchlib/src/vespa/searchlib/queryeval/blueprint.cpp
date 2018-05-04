@@ -4,6 +4,7 @@
 #include "leaf_blueprints.h"
 #include "intermediate_blueprints.h"
 #include "equiv_blueprint.h"
+#include <vespa/searchlib/fef/termfieldmatchdataarray.h>
 #include <vespa/vespalib/objects/visit.hpp>
 #include <vespa/vespalib/objects/objectdumper.h>
 #include <vespa/vespalib/util/classname.h>
@@ -69,7 +70,7 @@ Blueprint::State::State(const FieldSpecBaseList &fields_in)
 {
 }
 
-Blueprint::State::~State() { }
+Blueprint::State::~State() = default;
 
 Blueprint::Blueprint()
     : _parent(0),
@@ -79,9 +80,7 @@ Blueprint::Blueprint()
 {
 }
 
-Blueprint::~Blueprint()
-{
-}
+Blueprint::~Blueprint() = default;
 
 Blueprint::UP
 Blueprint::optimize(Blueprint::UP bp) {
@@ -385,11 +384,11 @@ IntermediateBlueprint::visitMembers(vespalib::ObjectVisitor &visitor) const
 }
 
 void
-IntermediateBlueprint::fetchPostings(bool strict)
+IntermediateBlueprint::fetchPostings(bool strict, const BitVector * filter)
 {
     for (size_t i = 0; i < _children.size(); ++i) {
         bool strictChild = (strict && inheritStrict(i));
-        _children[i]->fetchPostings(strictChild);
+        _children[i]->fetchPostings(strictChild, filter);
     }
 }
 
@@ -469,12 +468,11 @@ LeafBlueprint::LeafBlueprint(const FieldSpecBaseList &fields, bool allow_termwis
     _state.allow_termwise_eval(allow_termwise_eval);
 }
 
-LeafBlueprint::~LeafBlueprint() { }
+LeafBlueprint::~LeafBlueprint() = default;
 
 void
-LeafBlueprint::fetchPostings(bool strict)
+LeafBlueprint::fetchPostings(bool, const BitVector *)
 {
-    (void) strict;
 }
 
 void

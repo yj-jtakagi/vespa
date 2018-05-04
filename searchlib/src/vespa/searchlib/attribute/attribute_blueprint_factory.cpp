@@ -129,8 +129,8 @@ public:
         return _search_context->createIterator(tfmda[0], strict);
     }
 
-    void fetchPostings(bool strict) override {
-        _search_context->fetchPostings(strict);
+    void fetchPostings(bool strict, const BitVector * filter) override {
+        _search_context->fetchPostings(strict, filter);
     }
 
     void visitMembers(vespalib::ObjectVisitor &visitor) const override;
@@ -206,9 +206,9 @@ public:
         }
     }
 
-    virtual void fetchPostings(bool strict) override {
+    virtual void fetchPostings(bool strict, const BitVector * filter) override {
         for (size_t i(0); i < _rangeSearches.size(); i++) {
-            _rangeSearches[i]->fetchPostings(strict);
+            _rangeSearches[i]->fetchPostings(strict, filter);
         }
     }
 };

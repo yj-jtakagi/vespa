@@ -7,8 +7,7 @@
 #include <vespa/vespalib/objects/visit.hpp>
 #include <algorithm>
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 ParallelWeakAndBlueprint::ParallelWeakAndBlueprint(const FieldSpec &field,
                                                    uint32_t scoresToTrack,
@@ -103,10 +102,10 @@ ParallelWeakAndBlueprint::createLeafSearch(const search::fef::TermFieldMatchData
 }
 
 void
-ParallelWeakAndBlueprint::fetchPostings(bool)
+ParallelWeakAndBlueprint::fetchPostings(bool, const BitVector * filter)
 {
     for (size_t i = 0; i < _terms.size(); ++i) {
-        _terms[i]->fetchPostings(true);
+        _terms[i]->fetchPostings(true, filter);
     }
 }
 
@@ -118,5 +117,4 @@ ParallelWeakAndBlueprint::visitMembers(vespalib::ObjectVisitor &visitor) const
     visit(visitor, "_terms", _terms);
 }
 
-}  // namespace search::queryeval
-}  // namespace search
+}

@@ -184,11 +184,11 @@ AttributeWeightedSetBlueprint::createLeafSearch(const fef::TermFieldMatchDataArr
 }
 
 void
-AttributeWeightedSetBlueprint::fetchPostings(bool strict)
+AttributeWeightedSetBlueprint::fetchPostings(bool strict, const BitVector * filter)
 {
     if (strict) {
         for (size_t i = 0; i < _contexts.size(); ++i) {
-            _contexts[i]->fetchPostings(true);
+            _contexts[i]->fetchPostings(true, filter);
         }
     }
 }
