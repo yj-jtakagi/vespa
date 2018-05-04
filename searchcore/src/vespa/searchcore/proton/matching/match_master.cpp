@@ -10,8 +10,7 @@
 #include <vespa/log/log.h>
 LOG_SETUP(".proton.matching.match_master");
 
-namespace proton {
-namespace matching {
+namespace proton::matching {
 
 using namespace search::fef;
 using search::queryeval::SearchIterator;
@@ -144,5 +143,4 @@ MatchMaster::getFeatureSet(const MatchToolsFactory &matchToolsFactory,
     return retval;
 }
 
-} // namespace proton::matching
-} // namespace proton
+}
