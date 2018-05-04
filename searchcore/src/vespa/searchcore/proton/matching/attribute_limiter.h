@@ -10,8 +10,7 @@
 #include <vespa/searchlib/fef/matchdata.h>
 #include <mutex>
 
-namespace proton {
-namespace matching {
+namespace proton::matching {
 
 /**
  * This class is responsible for creating attribute-based search
@@ -32,7 +31,8 @@ public:
                      double diversityCutoffFactor,
                      DiversityCutoffStrategy diversityCutoffStrategy);
     ~AttributeLimiter();
-    search::queryeval::SearchIterator::UP create_search(size_t want_hits, size_t max_group_size, bool strictSearch);
+    search::queryeval::SearchIterator::UP
+    create_search(const search::BitVector * filter, size_t want_hits, size_t max_group_size, bool strictSearch);
     bool was_used() const { return ((!_match_datas.empty()) || (_blueprint.get() != nullptr)); }
     ssize_t getEstimatedHits() const { return _estimatedHits; }
     static DiversityCutoffStrategy toDiversityCutoffStrategy(const vespalib::stringref & strategy);
@@ -51,6 +51,4 @@ private:
     DiversityCutoffStrategy                    _diversityCutoffStrategy;
 };
 
-} // namespace proton::matching
-} // namespace proton
-
+}

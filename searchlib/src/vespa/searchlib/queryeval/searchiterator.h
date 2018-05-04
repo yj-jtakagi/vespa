@@ -325,6 +325,12 @@ public:
     virtual bool isMultiSearch() const { return false; }
 
     /**
+     *
+     * @return underlying precomputed BitVector if any.
+     */
+    virtual BitVector * precomputedBitVector() const { return nullptr; }
+
+    /**
      * This is used for adding an extra filter. If it is accepted it will return an empty UP.
      * If not you will get in in return. Currently it will only be accepted by a
      * MultiBitVector<And> with a pure 'and' path down if it is an BitVector,

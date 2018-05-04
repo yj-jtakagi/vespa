@@ -100,6 +100,7 @@ public:
     ~MatchToolsFactory();
     bool valid() const { return _valid; }
     const MaybeMatchPhaseLimiter &match_limiter() const { return *_match_limiter; }
+    void enableMatchPhasePreFilter();
     MatchTools::UP createMatchTools() const;
     search::queryeval::Blueprint::HitEstimate estimate() const { return _query.estimate(); }
     bool has_first_phase_rank() const { return !_rankSetup.getFirstPhaseRank().empty(); }

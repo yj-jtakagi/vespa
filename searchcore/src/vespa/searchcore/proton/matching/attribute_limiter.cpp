@@ -5,6 +5,9 @@
 #include <vespa/searchlib/fef/matchdatalayout.h>
 #include <vespa/searchlib/query/tree/range.h>
 #include <vespa/searchlib/query/tree/simplequery.h>
+#include <vespa/searchlib/common/prefilter.h>
+#include <vespa/searchlib/common/bitvector.h>
+
 
 using namespace search::queryeval;
 using namespace search::query;
@@ -41,6 +44,17 @@ namespace {
 vespalib::string STRICT_STR("strict");
 vespalib::string LOOSE_STR("loose");
 
+class BitVectorFilter : public search::PreFilter
+{
+public:
+    BitVectorFilter(const search::BitVector * filter) : _filter(filter) {}
+    bool keep(uint32_t key) const override {
+        return _filter->testBit(key);
+    }
+private:
+    const search::BitVector *_filter;
+};
+
 }
 
 AttributeLimiter::DiversityCutoffStrategy
@@ -56,7 +70,7 @@ AttributeLimiter::toString(DiversityCutoffStrategy strategy)
 }
 
 SearchIterator::UP
-AttributeLimiter::create_search(size_t want_hits, size_t max_group_size, bool strictSearch)
+AttributeLimiter::create_search(const search::BitVector * filter, size_t want_hits, size_t max_group_size, bool strictSearch)
 {
     std::lock_guard<std::mutex> guard(_lock);
     const uint32_t my_field_id = 0;
@@ -78,7 +92,12 @@ AttributeLimiter::create_search(size_t want_hits, size_t max_group_size, bool st
         field.add(FieldSpec(_attribute_name, my_field_id, my_handle));
         _blueprint = _searchable_attributes.createBlueprint(_requestContext, field, node);
         //TODO: Put in any bitvectors from termwise eval here.
-        _blueprint->fetchPostings(strictSearch, nullptr);
+        if (filter != nullptr) {
+            BitVectorFilter bvf(filter);
+            _blueprint->fetchPostings(strictSearch, &bvf);
+        } else {
+            _blueprint->fetchPostings(strictSearch, nullptr);
+        }
         _estimatedHits = _blueprint->getState().estimate().estHits;
         _blueprint->freeze();
     }

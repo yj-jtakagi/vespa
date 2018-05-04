@@ -22,6 +22,9 @@ struct TermwiseSearch : public SearchIterator {
         : search(std::move(search_in)), result(), my_beginid(0), my_first_hit(0) {}
 
     Trinary is_strict() const override { return IS_STRICT ? Trinary::True : Trinary::False; }
+
+    BitVector * precomputedBitVector() const override { return result.get(); }
+
     void initRange(uint32_t beginid, uint32_t endid) override {
         if (!same_range(beginid, endid)) {
             my_beginid = beginid;

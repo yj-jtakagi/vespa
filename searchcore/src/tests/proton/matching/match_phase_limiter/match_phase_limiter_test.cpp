@@ -162,10 +162,10 @@ TEST("require that the attribute limiter works correctly") {
         AttributeLimiter limiter(searchable, requestContext, "limiter_attribute", descending, "category", 10.0, AttributeLimiter::LOOSE);
         EXPECT_EQUAL(0u, searchable.create_cnt);
         EXPECT_FALSE(limiter.was_used());
-        SearchIterator::UP s1 = limiter.create_search(42, diverse ? 3 : 42, strict);
+        SearchIterator::UP s1 = limiter.create_search(nullptr, 42, diverse ? 3 : 42, strict);
         EXPECT_TRUE(limiter.was_used());
         EXPECT_EQUAL(1u, searchable.create_cnt);
-        SearchIterator::UP s2 = limiter.create_search(42, diverse ? 3 : 42, strict);
+        SearchIterator::UP s2 = limiter.create_search(nullptr, 42, diverse ? 3 : 42, strict);
         EXPECT_EQUAL(1u, searchable.create_cnt);
         MockSearch *ms = dynamic_cast<MockSearch*>(s1.get());
         ASSERT_TRUE(ms != nullptr);

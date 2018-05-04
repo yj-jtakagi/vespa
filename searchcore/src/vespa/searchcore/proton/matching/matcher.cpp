@@ -75,8 +75,8 @@ public:
         _threadBundle(threadBundle),
         _maxThreads(std::min(maxThreads, static_cast<uint32_t>(threadBundle.size())))
     { }
-private:
     size_t size() const override { return _maxThreads; }
+private:
     void run(const std::vector<vespalib::Runnable*> &targets) override {
         _threadBundle.run(targets);
     }
@@ -254,6 +254,9 @@ Matcher::match(const SearchRequest &request, vespalib::ThreadBundle &threadBundl
         MatchMaster master;
         uint32_t numSearchPartitions = NumSearchPartitions::lookup(rankProperties,
                                                                    _rankSetup->getNumSearchPartitions());
+        if ((limitedThreadBundle.size() == 1) && (numSearchPartitions == 1)) {
+            mtf->enableMatchPhasePreFilter();
+        }
         ResultProcessor::Result::UP result = master.match(params, limitedThreadBundle, *mtf, rp,
                                                           _distributionKey, numSearchPartitions);
         my_stats = MatchMaster::getStats(std::move(master));
