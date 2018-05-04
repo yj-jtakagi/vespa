@@ -66,7 +66,7 @@ areAnyParentsEquiv(const Blueprint * node)
 }
 
 void
-DiskTermBlueprint::fetchPostings(bool strict, const BitVector * filter)
+DiskTermBlueprint::fetchPostings(bool strict, const PreFilter * filter)
 {
     (void) strict;
     (void) filter;

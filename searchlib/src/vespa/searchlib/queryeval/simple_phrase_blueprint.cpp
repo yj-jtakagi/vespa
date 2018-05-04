@@ -81,7 +81,7 @@ SimplePhraseBlueprint::createLeafSearch(const search::fef::TermFieldMatchDataArr
 
 
 void
-SimplePhraseBlueprint::fetchPostings(bool strict, const BitVector * filter)
+SimplePhraseBlueprint::fetchPostings(bool strict, const PreFilter * filter)
 {
     for (size_t i = 0; i < _terms.size(); ++i) {
         _terms[i]->fetchPostings(strict, filter);

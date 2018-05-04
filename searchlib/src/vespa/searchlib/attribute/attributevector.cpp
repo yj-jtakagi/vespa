@@ -633,7 +633,7 @@ createFilterIterator(fef::TermFieldMatchData *matchData, bool strict)
 
 
 void
-AttributeVector::SearchContext::fetchPostings(bool strict, const BitVector * filter) {
+AttributeVector::SearchContext::fetchPostings(bool strict, const PreFilter * filter) {
     if (_plsc != nullptr) {
         _plsc->fetchPostings(strict, filter);
     }

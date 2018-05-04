@@ -4,8 +4,7 @@
 #include <vespa/vespalib/objects/visit.h>
 #include <vespa/searchlib/common/bitvector.h>
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 template <bool IS_STRICT>
 struct TermwiseSearch : public SearchIterator {
@@ -58,11 +57,10 @@ SearchIterator::UP
 make_termwise(SearchIterator::UP search, bool strict)
 {
     if (strict) {
-        return SearchIterator::UP(new TermwiseSearch<true>(std::move(search)));
+        return std::make_unique<TermwiseSearch<true>>(std::move(search));
     } else {
-        return SearchIterator::UP(new TermwiseSearch<false>(std::move(search)));        
+        return std::make_unique<TermwiseSearch<false>>(std::move(search));
     }
 }
 
-} // namespace queryeval
-} // namespace search
+}

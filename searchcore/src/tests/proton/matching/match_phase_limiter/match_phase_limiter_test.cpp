@@ -67,7 +67,7 @@ struct MockBlueprint : SimpleLeafBlueprint {
         return SearchIterator::UP(new MockSearch(spec, term, strict, tfmda,
                                                  postings_fetched));
     }
-    void fetchPostings(bool strict, const search::BitVector *) override {
+    void fetchPostings(bool strict, const search::PreFilter *) override {
         postings_strict = strict;
         postings_fetched = true;
     }

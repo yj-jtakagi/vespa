@@ -40,7 +40,7 @@ EnumHintSearchContext::lookupRange(const EnumStoreComparator &low, const EnumSto
 }
 
 void
-EnumHintSearchContext::fetchPostings(bool strict, const BitVector * filter)
+EnumHintSearchContext::fetchPostings(bool strict, const PreFilter * filter)
 {
     (void) strict;
     (void) filter;

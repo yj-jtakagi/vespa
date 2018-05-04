@@ -542,7 +542,7 @@ public:
         // Implements attribute::ISearchContext
         unsigned int approximateHits() const override;
         queryeval::SearchIterator::UP createIterator(fef::TermFieldMatchData *matchData, bool strict) override;
-        void fetchPostings(bool strict, const BitVector * filter) override;
+        void fetchPostings(bool strict, const PreFilter * filter) override;
         bool valid() const override { return false; }
         Int64Range getAsIntegerTerm() const override { return Int64Range(); }
         const QueryTermBase &queryTerm() const override {

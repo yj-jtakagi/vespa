@@ -129,7 +129,7 @@ public:
         return _search_context->createIterator(tfmda[0], strict);
     }
 
-    void fetchPostings(bool strict, const BitVector * filter) override {
+    void fetchPostings(bool strict, const PreFilter * filter) override {
         _search_context->fetchPostings(strict, filter);
     }
 
@@ -206,7 +206,7 @@ public:
         }
     }
 
-    virtual void fetchPostings(bool strict, const BitVector * filter) override {
+    virtual void fetchPostings(bool strict, const PreFilter * filter) override {
         for (size_t i(0); i < _rangeSearches.size(); i++) {
             _rangeSearches[i]->fetchPostings(strict, filter);
         }

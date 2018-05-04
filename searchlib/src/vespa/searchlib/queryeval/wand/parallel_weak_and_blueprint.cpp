@@ -102,7 +102,7 @@ ParallelWeakAndBlueprint::createLeafSearch(const search::fef::TermFieldMatchData
 }
 
 void
-ParallelWeakAndBlueprint::fetchPostings(bool, const BitVector * filter)
+ParallelWeakAndBlueprint::fetchPostings(bool, const PreFilter * filter)
 {
     for (size_t i = 0; i < _terms.size(); ++i) {
         _terms[i]->fetchPostings(true, filter);

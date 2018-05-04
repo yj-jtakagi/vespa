@@ -6,7 +6,7 @@
 
 namespace search::queryeval { class SearchIterator; }
 namespace search::fef { class TermFieldMatchData; }
-namespace search { class BitVector; }
+namespace search { class PreFilter; }
 
 namespace search::attribute {
 
@@ -31,7 +31,7 @@ public:
      * @param strict If true iterator must advance to next valid docid.
      * @param filter Any prefilter that can be applied to posting lists for optimization purposes.
      */
-    virtual void fetchPostings(bool strict, const BitVector * filter) = 0;
+    virtual void fetchPostings(bool strict, const PreFilter * filter) = 0;
     virtual std::unique_ptr<queryeval::SearchIterator> createPostingIterator(fef::TermFieldMatchData *matchData, bool strict) = 0;
     virtual unsigned int approximateHits() const = 0;
 };

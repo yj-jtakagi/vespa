@@ -384,7 +384,7 @@ IntermediateBlueprint::visitMembers(vespalib::ObjectVisitor &visitor) const
 }
 
 void
-IntermediateBlueprint::fetchPostings(bool strict, const BitVector * filter)
+IntermediateBlueprint::fetchPostings(bool strict, const PreFilter * filter)
 {
     for (size_t i = 0; i < _children.size(); ++i) {
         bool strictChild = (strict && inheritStrict(i));
@@ -471,7 +471,7 @@ LeafBlueprint::LeafBlueprint(const FieldSpecBaseList &fields, bool allow_termwis
 LeafBlueprint::~LeafBlueprint() = default;
 
 void
-LeafBlueprint::fetchPostings(bool, const BitVector *)
+LeafBlueprint::fetchPostings(bool, const PreFilter *)
 {
 }
 

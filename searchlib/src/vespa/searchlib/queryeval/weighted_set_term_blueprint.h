@@ -37,7 +37,7 @@ public:
     void visitMembers(vespalib::ObjectVisitor &visitor) const override;
 
 private:
-    void fetchPostings(bool strict, const BitVector * filter) override;
+    void fetchPostings(bool strict, const PreFilter * filter) override;
 };
 
 }

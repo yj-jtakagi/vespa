@@ -57,7 +57,7 @@ WeightedSetTermBlueprint::createLeafSearch(const search::fef::TermFieldMatchData
 }
 
 void
-WeightedSetTermBlueprint::fetchPostings(bool strict, const BitVector * filter)
+WeightedSetTermBlueprint::fetchPostings(bool strict, const PreFilter * filter)
 {
     (void) strict;
     for (size_t i = 0; i < _terms.size(); ++i) {
