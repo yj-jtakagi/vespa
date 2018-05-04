@@ -220,7 +220,7 @@ WarmupIndexCollection::WarmupTask::run()
 {
     if (_warmup._warmupEndTime != 0) {
         LOG(debug, "Warming up %s", _bluePrint->asString().c_str());
-        _bluePrint->fetchPostings(true);
+        _bluePrint->fetchPostings(true, nullptr);
         SearchIterator::UP it(_bluePrint->createSearch(*_matchData, true));
         it->initFullRange();
         for (uint32_t docId = it->seekFirst(1); !it->isAtEnd(); docId = it->seekNext(docId+1)) {
