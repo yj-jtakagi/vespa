@@ -11,8 +11,7 @@
 #include <vespa/searchlib/queryeval/blueprint.h>
 #include <atomic>
 
-namespace proton {
-namespace matching {
+namespace proton::matching {
 
 class LimitedSearch : public search::queryeval::SearchIterator {
 public:
@@ -52,6 +51,7 @@ struct MaybeMatchPhaseLimiter {
     virtual SearchIterator::UP maybe_limit(SearchIterator::UP search, double match_freq, size_t num_docs) = 0;
     virtual void updateDocIdSpaceEstimate(size_t searchedDocIdSpace, size_t remainingDocIdSpace) = 0;
     virtual size_t getDocIdSpaceEstimate() const = 0;
+    virtual void enablePreFilter() = 0;
     virtual ~MaybeMatchPhaseLimiter() {}
 };
 
@@ -67,6 +67,7 @@ struct NoMatchPhaseLimiter : MaybeMatchPhaseLimiter {
     }
     void updateDocIdSpaceEstimate(size_t, size_t) override { }
     size_t getDocIdSpaceEstimate() const override { return std::numeric_limits<size_t>::max(); }
+    void enablePreFilter() override { }
 };
 
 /**
@@ -95,6 +96,7 @@ private:
     };
     const double              _postFilterMultiplier;
     const double              _maxFilterCoverage;
+    bool                      _enablePreFilter;
     MatchPhaseLimitCalculator _calculator;
     AttributeLimiter          _limiter_factory;
     Coverage                  _coverage;
@@ -119,8 +121,7 @@ public:
     SearchIterator::UP maybe_limit(SearchIterator::UP search, double match_freq, size_t num_docs) override;
     void updateDocIdSpaceEstimate(size_t searchedDocIdSpace, size_t remainingDocIdSpace) override;
     size_t getDocIdSpaceEstimate() const override;
+    void enablePreFilter() override { _enablePreFilter = true; }
 };
 
-} // namespace proton::matching
-} // namespace proton
-
+}

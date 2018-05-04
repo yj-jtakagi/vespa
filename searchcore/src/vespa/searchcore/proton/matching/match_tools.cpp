@@ -181,12 +181,18 @@ MatchToolsFactory(QueryLimiter               & queryLimiter,
                             AttributeLimiter::toDiversityCutoffStrategy(_rankSetup.getDiversityCutoffStrategy())));
         }
     }
-    if (_match_limiter.get() == nullptr) {
-        _match_limiter.reset(new NoMatchPhaseLimiter());
+    if (!_match_limiter) {
+        _match_limiter = std::make_unique<NoMatchPhaseLimiter>();
     }
 }
 
-MatchToolsFactory::~MatchToolsFactory() {}
+MatchToolsFactory::~MatchToolsFactory() = default;
+
+void
+MatchToolsFactory::enableMatchPhasePreFilter()
+{
+    _match_limiter->enablePreFilter();
+}
 
 MatchTools::UP
 MatchToolsFactory::createMatchTools() const
