@@ -34,7 +34,7 @@ protected:
     queryeval::SearchIterator::UP
     createPostingIterator(fef::TermFieldMatchData *matchData, bool strict) override;
 
-    void fetchPostings(bool strict, const BitVector * filter) override;
+    void fetchPostings(bool strict, const PreFilter * filter) override;
     unsigned int approximateHits() const override;
 };
 

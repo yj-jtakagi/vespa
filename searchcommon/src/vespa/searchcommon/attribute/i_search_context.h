@@ -5,12 +5,11 @@
 #include <vespa/searchcommon/common/range.h>
 #include <vespa/vespalib/stllike/string.h>
 
-
 namespace search::fef { class TermFieldMatchData; }
 namespace search::queryeval { class SearchIterator; }
 namespace search {
     class QueryTermBase;
-    class BitVector;
+    class PreFilter;
 }
 
 namespace search::attribute {
@@ -50,7 +49,7 @@ public:
      * @param strict If true iterator must advance to next valid docid.
      * @param filter Any prefilter that can be applied to posting lists for optimization purposes.
      */
-    virtual void fetchPostings(bool strict, const BitVector * filter) = 0;
+    virtual void fetchPostings(bool strict, const PreFilter * filter) = 0;
 
     virtual bool valid() const = 0;
     virtual Int64Range getAsIntegerTerm() const = 0;

@@ -44,7 +44,7 @@ EquivBlueprint::visitMembers(vespalib::ObjectVisitor &visitor) const
 }
 
 void
-EquivBlueprint::fetchPostings(bool strict, const BitVector * filter)
+EquivBlueprint::fetchPostings(bool strict, const PreFilter * filter)
 {
     for (size_t i = 0; i < _terms.size(); ++i) {
         _terms[i]->fetchPostings(strict, filter);

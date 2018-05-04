@@ -34,7 +34,7 @@ public:
 
     SearchIteratorUP createLeafSearch(const search::fef::TermFieldMatchDataArray &tfmda, bool strict) const override;
     void visitMembers(vespalib::ObjectVisitor &visitor) const override;
-    void fetchPostings(bool strict, const BitVector * filter) override;
+    void fetchPostings(bool strict, const PreFilter * filter) override;
 };
 
 }

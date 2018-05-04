@@ -48,7 +48,7 @@ public:
                        const query::PredicateQuery &query);
 
     ~PredicateBlueprint();
-    void fetchPostings(bool strict, const BitVector * filter) override;
+    void fetchPostings(bool strict, const PreFilter * filter) override;
 
     SearchIterator::UP
     createLeafSearch(const fef::TermFieldMatchDataArray &tfmda, bool strict) const override;

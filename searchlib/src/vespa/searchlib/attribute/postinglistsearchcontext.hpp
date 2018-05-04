@@ -111,7 +111,7 @@ PostingListSearchContextT<DataT>::fillBitVector()
 
 template <typename DataT>
 void
-PostingListSearchContextT<DataT>::fetchPostings(bool strict, const BitVector * filter)
+PostingListSearchContextT<DataT>::fetchPostings(bool strict, const PreFilter * filter)
 {
     (void) filter;
     assert(!_fetchPostingsDone);

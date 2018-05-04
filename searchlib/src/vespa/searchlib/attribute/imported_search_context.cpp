@@ -226,7 +226,7 @@ ImportedSearchContext::considerAddSearchCacheEntry()
     }
 }
 
-void ImportedSearchContext::fetchPostings(bool strict, const BitVector * filter) {
+void ImportedSearchContext::fetchPostings(bool strict, const PreFilter * filter) {
     assert(!_fetchPostingsDone);
     _fetchPostingsDone = true;
     if (!_searchCacheLookup) {

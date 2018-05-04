@@ -6,7 +6,7 @@
 #include "unpackinfo.h"
 
 namespace vespalib { class ObjectVisitor; }
-namespace search { class BitVector; }
+namespace search { class PreFilter; }
 namespace search::fef {
     class TermFieldMatchDataArray;
     class MatchData;
@@ -171,7 +171,7 @@ public:
      * @param strict If true iterators produced must advance to next valid docid.
      * @param filter Any prefilter that can be applied to posting lists for optimization purposes.
      */
-    virtual void fetchPostings(bool strict, const BitVector * filter) = 0;
+    virtual void fetchPostings(bool strict, const PreFilter * filter) = 0;
     virtual void freeze() = 0;
     bool frozen() const { return _frozen; }
 
@@ -270,7 +270,7 @@ public:
                              bool strict, fef::MatchData &md) const = 0;
 
     void visitMembers(vespalib::ObjectVisitor &visitor) const override;
-    void fetchPostings(bool strict, const BitVector * filter) override;
+    void fetchPostings(bool strict, const PreFilter * filter) override;
     void freeze() override final;
 
     UnpackInfo calculateUnpackInfo(const fef::MatchData & md) const;
@@ -294,7 +294,7 @@ public:
     ~LeafBlueprint();
     const State &getState() const override final { return _state; }
     void setDocIdLimit(uint32_t limit) override final { Blueprint::setDocIdLimit(limit); }
-    void fetchPostings(bool strict, const BitVector * filter) override;
+    void fetchPostings(bool strict, const PreFilter * filter) override;
     void freeze() override final;
     SearchIteratorUP createSearch(fef::MatchData &md, bool strict) const override;
 
