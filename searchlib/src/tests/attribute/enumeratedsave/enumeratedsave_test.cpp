@@ -694,7 +694,7 @@ EnumeratedSaveTest::testReload(AttributePtr v0,
 
     TermFieldMatchData md;
     SearchContextPtr sc = getSearch<VectorType>(as<VectorType>(v));
-    sc->fetchPostings(true);
+    sc->fetchPostings(true, nullptr);
     SearchBasePtr sb = sc->createIterator(&md, true);
     sb->initFullRange();
     sb->seek(1u);
@@ -718,8 +718,7 @@ EnumeratedSaveTest::testReload(AttributePtr v0,
 
 template <typename VectorType, typename BufferType>
 void
-EnumeratedSaveTest::test(BasicType bt, CollectionType ct,
-                         const vespalib::string &pref)
+EnumeratedSaveTest::test(BasicType bt, CollectionType ct, const vespalib::string &pref)
 {
     Config cfg(bt, ct);
     AttributePtr v0 = AttributeFactory::createAttribute(pref + "0", cfg);

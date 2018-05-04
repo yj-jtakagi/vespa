@@ -119,7 +119,7 @@ protected:
     void fillArray();
     void fillBitVector();
 
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
     // this will be called instead of the fetchPostings function in some cases
     void diversify(bool forward, size_t wanted_hits, const IAttributeVector &diversity_attr,
                    size_t max_per_group, size_t cutoff_groups, bool cutoff_strict);
@@ -224,7 +224,7 @@ private:
             ? limit
             : estimate;
     }
-    void fetchPostings(bool strict) override {
+    void fetchPostings(bool strict, const BitVector * filter) override {
         if (params().diversityAttribute() != nullptr) {
             bool forward = (this->getRangeLimit() > 0);
             size_t wanted_hits = std::abs(this->getRangeLimit());
@@ -232,7 +232,7 @@ private:
                                                         *(params().diversityAttribute()), this->getMaxPerGroup(),
                                                         params().diversityCutoffGroups(), params().diversityCutoffStrict());
         } else {
-            PostingListSearchContextT<DataT>::fetchPostings(strict);
+            PostingListSearchContextT<DataT>::fetchPostings(strict, filter);
         }
     }
 
@@ -261,7 +261,7 @@ PostingSearchContext(QueryTermSimpleUP qTerm, bool useBitVector, const AttrT &to
 }
 
 template <typename BaseSC, typename BaseSC2, typename AttrT>
-PostingSearchContext<BaseSC, BaseSC2, AttrT>::~PostingSearchContext() { }
+PostingSearchContext<BaseSC, BaseSC2, AttrT>::~PostingSearchContext() = default;
 
 
 template <typename BaseSC, typename AttrT, typename DataT>

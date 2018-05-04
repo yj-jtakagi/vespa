@@ -540,15 +540,15 @@ public:
         ~SearchContext();
 
         // Implements attribute::ISearchContext
-        virtual unsigned int approximateHits() const override;
-        virtual queryeval::SearchIterator::UP createIterator(fef::TermFieldMatchData *matchData, bool strict) override;
-        virtual void fetchPostings(bool strict) override;
-        virtual bool valid() const override { return false; }
-        virtual Int64Range getAsIntegerTerm() const override { return Int64Range(); }
-        virtual const QueryTermBase &queryTerm() const override {
+        unsigned int approximateHits() const override;
+        queryeval::SearchIterator::UP createIterator(fef::TermFieldMatchData *matchData, bool strict) override;
+        void fetchPostings(bool strict, const BitVector * filter) override;
+        bool valid() const override { return false; }
+        Int64Range getAsIntegerTerm() const override { return Int64Range(); }
+        const QueryTermBase &queryTerm() const override {
             return *static_cast<const QueryTermBase *>(NULL);
         }
-        virtual const vespalib::string &attributeName() const override {
+        const vespalib::string &attributeName() const override {
             return _attr.getName();
         }
 
@@ -570,8 +570,8 @@ public:
     };
 
     SearchContext::UP getSearch(QueryPacketT searchSpec, const attribute::SearchContextParams &params) const;
-    virtual attribute::ISearchContext::UP createSearchContext(QueryTermSimpleUP term,
-                                                              const attribute::SearchContextParams &params) const override;
+     attribute::ISearchContext::UP createSearchContext(QueryTermSimpleUP term,
+                                                       const attribute::SearchContextParams &params) const override;
     virtual SearchContext::UP getSearch(QueryTermSimpleUP term, const attribute::SearchContextParams &params) const = 0;
     virtual const EnumStoreBase *getEnumStoreBase() const;
     virtual const attribute::MultiValueMappingBase *getMultiValueBase() const;
@@ -662,15 +662,15 @@ public:
     bool hasPostings();
     virtual uint64_t getUniqueValueCount() const;
     virtual uint64_t getTotalValueCount() const;
-    virtual void compactLidSpace(uint32_t wantedLidLimit) override;
+    void compactLidSpace(uint32_t wantedLidLimit) override;
     virtual void clearDocs(DocId lidLow, DocId lidLimit);
     bool wantShrinkLidSpace() const { return _committedDocIdLimit < getNumDocs(); }
-    virtual bool canShrinkLidSpace() const override;
-    virtual void shrinkLidSpace() override;
+    bool canShrinkLidSpace() const override;
+    void shrinkLidSpace() override;
     virtual void onShrinkLidSpace();
-    virtual size_t getEstimatedShrinkLidSpaceGain() const override;
+    size_t getEstimatedShrinkLidSpaceGain() const override;
 
-    virtual std::unique_ptr<attribute::AttributeReadGuard> makeReadGuard(bool stableEnumGuard) const override;
+    std::unique_ptr<attribute::AttributeReadGuard> makeReadGuard(bool stableEnumGuard) const override;
 
     void setInterlock(const std::shared_ptr<attribute::Interlock> &interlock);
 

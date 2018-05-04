@@ -164,7 +164,7 @@ verifyResult(const FakeResult &expect,
     EXPECT_EQUAL(expect.inspect().size(), result->getState().estimate().estHits);
     EXPECT_EQUAL(expect.inspect().empty(), result->getState().estimate().empty);
 
-    result->fetchPostings(true);
+    result->fetchPostings(true, nullptr);
     SearchIterator::UP search = result->createSearch(*match_data, true);
     if (!EXPECT_TRUE(search.get() != 0)) {
         return false;
@@ -432,7 +432,7 @@ TEST("requireThatWeCanFakeBitVector")
         Blueprint::UP res = searchable.createBlueprint(requestContext, fields, makeTerm(foo));
         EXPECT_TRUE(res.get() != NULL);
 
-        res->fetchPostings(true);
+        res->fetchPostings(true, nullptr);
         SearchIterator::UP search = res->createSearch(*match_data, true);
         EXPECT_TRUE(search.get() != NULL);
         EXPECT_TRUE(dynamic_cast<BooleanMatchIteratorWrapper *>(search.get()) != NULL);

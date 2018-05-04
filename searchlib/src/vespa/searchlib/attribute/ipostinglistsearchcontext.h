@@ -4,12 +4,11 @@
 
 #include <memory>
 
-namespace search {
+namespace search::queryeval { class SearchIterator; }
+namespace search::fef { class TermFieldMatchData; }
+namespace search { class BitVector; }
 
-namespace queryeval { class SearchIterator; }
-namespace fef { class TermFieldMatchData; }
-
-namespace attribute {
+namespace search::attribute {
 
 
 /**
@@ -27,10 +26,14 @@ protected:
     virtual ~IPostingListSearchContext() { }
 
 public:
-    virtual void fetchPostings(bool strict) = 0;
+    /**
+     * Will load/prepare any postings lists. Will take strictness and optional filter into account.
+     * @param strict If true iterator must advance to next valid docid.
+     * @param filter Any prefilter that can be applied to posting lists for optimization purposes.
+     */
+    virtual void fetchPostings(bool strict, const BitVector * filter) = 0;
     virtual std::unique_ptr<queryeval::SearchIterator> createPostingIterator(fef::TermFieldMatchData *matchData, bool strict) = 0;
     virtual unsigned int approximateHits() const = 0;
 };
 
-} // namespace attribute
-} // namespace search
+}

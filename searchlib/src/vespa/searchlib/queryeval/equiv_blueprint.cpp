@@ -4,8 +4,7 @@
 #include "equivsearch.h"
 #include <vespa/vespalib/objects/visit.hpp>
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 EquivBlueprint::EquivBlueprint(const FieldSpecBaseList &fields,
                                fef::MatchDataLayout subtree_mdl)
@@ -18,9 +17,7 @@ EquivBlueprint::EquivBlueprint(const FieldSpecBaseList &fields,
 {
 }
 
-EquivBlueprint::~EquivBlueprint()
-{
-}
+EquivBlueprint::~EquivBlueprint() = default;
 
 SearchIterator::UP
 EquivBlueprint::createLeafSearch(const search::fef::TermFieldMatchDataArray &outputs,
@@ -47,10 +44,10 @@ EquivBlueprint::visitMembers(vespalib::ObjectVisitor &visitor) const
 }
 
 void
-EquivBlueprint::fetchPostings(bool strict)
+EquivBlueprint::fetchPostings(bool strict, const BitVector * filter)
 {
     for (size_t i = 0; i < _terms.size(); ++i) {
-        _terms[i]->fetchPostings(strict);
+        _terms[i]->fetchPostings(strict, filter);
     }
 }
 
@@ -70,5 +67,4 @@ EquivBlueprint::addTerm(Blueprint::UP term, double exactness)
 }
 
 
-} // namespace queryeval
-} // namespace search
+}

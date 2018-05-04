@@ -30,11 +30,10 @@ public:
     void addTerm(Blueprint::UP term, int32_t weight);
 
     SearchIteratorUP
-    createLeafSearch(const search::fef::TermFieldMatchDataArray &tfmda,
-                     bool strict) const override;
+    createLeafSearch(const search::fef::TermFieldMatchDataArray &tfmda, bool strict) const override;
 
     void visitMembers(vespalib::ObjectVisitor &visitor) const override;
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
 };
 
 }

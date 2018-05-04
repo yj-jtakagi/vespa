@@ -91,7 +91,7 @@ bool search(const Node &node, IAttributeManager &attribute_manager) {
     ASSERT_TRUE(result.get());
     EXPECT_TRUE(!result->getState().estimate().empty);
     EXPECT_EQUAL(3u, result->getState().estimate().estHits);
-    result->fetchPostings(true);
+    result->fetchPostings(true, nullptr);
     result->setDocIdLimit(DOCID_LIMIT);
     SearchIterator::UP iterator = result->createSearch(*md, true);
     ASSERT_TRUE((bool)iterator);

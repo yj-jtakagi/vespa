@@ -3,6 +3,7 @@
 #include "lid_allocator.h"
 #include <vespa/searchlib/query/queryterm.h>
 #include <vespa/searchlib/common/bitvectoriterator.h>
+#include <vespa/searchlib/fef/termfieldmatchdataarray.h>
 #include <mutex>
 
 #include <vespa/log/log.h>
@@ -17,9 +18,7 @@ using vespalib::GenerationHolder;
 
 namespace proton::documentmetastore {
 
-LidAllocator::LidAllocator(uint32_t size,
-                           uint32_t capacity,
-                           GenerationHolder &genHolder)
+LidAllocator::LidAllocator(uint32_t size, uint32_t capacity, GenerationHolder &genHolder)
     : _holdLids(),
       _freeLids(size, capacity, genHolder, true, false),
       _usedLids(size, capacity, genHolder, false, true),
@@ -31,7 +30,7 @@ LidAllocator::LidAllocator(uint32_t size,
 
 }
 
-LidAllocator::~LidAllocator() {}
+LidAllocator::~LidAllocator() = default;
 
 LidAllocator::DocId
 LidAllocator::getFreeLid(DocId lidLimit)
@@ -56,8 +55,7 @@ LidAllocator::peekFreeLid(DocId lidLimit)
 }
 
 void
-LidAllocator::ensureSpace(uint32_t newSize,
-                          uint32_t newCapacity)
+LidAllocator::ensureSpace(uint32_t newSize, uint32_t newCapacity)
 {
     _freeLids.resizeVector(newSize, newCapacity);
     _usedLids.resizeVector(newSize, newCapacity);
@@ -120,9 +118,7 @@ LidAllocator::moveLidEnd(DocId fromLid, DocId toLid)
 }
 
 void
-LidAllocator::holdLid(DocId lid,
-                      DocId lidLimit,
-                      generation_t currentGeneration)
+LidAllocator::holdLid(DocId lid, DocId lidLimit, generation_t currentGeneration)
 {
     (void) lidLimit;
     assert(holdLidOK(lid, lidLimit));
@@ -135,9 +131,7 @@ LidAllocator::holdLid(DocId lid,
 }
 
 void
-LidAllocator::holdLids(const std::vector<DocId> &lids,
-                       DocId lidLimit,
-                       generation_t currentGeneration)
+LidAllocator::holdLids(const std::vector<DocId> &lids, DocId lidLimit, generation_t currentGeneration)
 {
     (void) lidLimit;
     for (const auto &lid : lids) {

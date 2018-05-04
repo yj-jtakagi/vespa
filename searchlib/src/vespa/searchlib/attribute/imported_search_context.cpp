@@ -44,8 +44,7 @@ ImportedSearchContext::ImportedSearchContext(
 
 }
 
-ImportedSearchContext::~ImportedSearchContext() {
-}
+ImportedSearchContext::~ImportedSearchContext() = default;
 
 unsigned int ImportedSearchContext::approximateHits() const {
     return _reference_attribute.getNumDocs();
@@ -227,11 +226,11 @@ ImportedSearchContext::considerAddSearchCacheEntry()
     }
 }
 
-void ImportedSearchContext::fetchPostings(bool strict) {
+void ImportedSearchContext::fetchPostings(bool strict, const BitVector * filter) {
     assert(!_fetchPostingsDone);
     _fetchPostingsDone = true;
     if (!_searchCacheLookup) {
-        _target_search_context->fetchPostings(strict);
+        _target_search_context->fetchPostings(strict, filter);
         if (strict || _target_attribute.getIsFastSearch()) {
             makeMergedPostings(_target_attribute.getIsFilter());
             considerAddSearchCacheEntry();

@@ -66,7 +66,7 @@ struct WS {
         Node::UP node = createNode();
         FieldSpecList fields = FieldSpecList().add(FieldSpec(field, fieldId, handle));
         queryeval::Blueprint::UP bp = searchable.createBlueprint(requestContext, fields, *node);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP sb = bp->createSearch(*md, strict);
         return (dynamic_cast<WeightedSetTermSearch*>(sb.get()) != 0);
     }
@@ -77,7 +77,7 @@ struct WS {
         Node::UP node = createNode();
         FieldSpecList fields = FieldSpecList().add(FieldSpec(field, fieldId, handle));
         queryeval::Blueprint::UP bp = searchable.createBlueprint(requestContext, fields, *node);
-        bp->fetchPostings(strict);
+        bp->fetchPostings(strict, nullptr);
         SearchIterator::UP sb = bp->createSearch(*md, strict);
         sb->initFullRange();
         FakeResult result;
@@ -106,11 +106,11 @@ struct MockSearch : public SearchIterator {
         SearchIterator::initRange(begin, end);
         setDocId(_initial);
     }
-    virtual void doSeek(uint32_t) override {
+    void doSeek(uint32_t) override {
         ++seekCnt;
         setAtEnd();
     }
-    virtual void doUnpack(uint32_t) override {}
+    void doUnpack(uint32_t) override {}
 };
 
 struct MockFixture {

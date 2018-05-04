@@ -230,7 +230,7 @@ Test::testNearSearch(MyQuery &query, uint32_t matchId)
     }
     search::fef::MatchData::UP md(layout.createMatchData());
 
-    bp->fetchPostings(true);
+    bp->fetchPostings(true, nullptr);
     search::queryeval::SearchIterator::UP near = bp->createSearch(*md, true);
     near->initFullRange();
     bool foundMatch = false;

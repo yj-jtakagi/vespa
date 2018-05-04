@@ -11,8 +11,7 @@ using namespace search::query;
 using vespalib::make_string;
 using vespalib::string;
 
-namespace proton {
-namespace matching {
+namespace proton::matching {
 
 AttributeLimiter::AttributeLimiter(Searchable &searchable_attributes,
                                    const IRequestContext & requestContext,
@@ -35,7 +34,7 @@ AttributeLimiter::AttributeLimiter(Searchable &searchable_attributes,
 {
 }
 
-AttributeLimiter::~AttributeLimiter() {}
+AttributeLimiter::~AttributeLimiter() = default;
 
 namespace {
 
@@ -78,7 +77,8 @@ AttributeLimiter::create_search(size_t want_hits, size_t max_group_size, bool st
         FieldSpecList field; // single field API is protected
         field.add(FieldSpec(_attribute_name, my_field_id, my_handle));
         _blueprint = _searchable_attributes.createBlueprint(_requestContext, field, node);
-        _blueprint->fetchPostings(strictSearch);
+        //TODO: Put in any bitvectors from termwise eval here.
+        _blueprint->fetchPostings(strictSearch, nullptr);
         _estimatedHits = _blueprint->getState().estimate().estHits;
         _blueprint->freeze();
     }
@@ -86,5 +86,4 @@ AttributeLimiter::create_search(size_t want_hits, size_t max_group_size, bool st
     return _blueprint->createSearch(*_match_datas.back(), strictSearch);
 }
 
-} // namespace proton::matching
-} // namespace proton
+}

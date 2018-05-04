@@ -5,8 +5,7 @@
 #include "blueprint.h"
 #include <vespa/searchlib/fef/matchdatalayout.h>
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 class EquivBlueprint : public ComplexLeafBlueprint
 {
@@ -19,7 +18,7 @@ private:
 
 public:
     EquivBlueprint(const FieldSpecBaseList &fields, fef::MatchDataLayout subtree_mdl);
-    virtual ~EquivBlueprint();
+    ~EquivBlueprint();
 
     // used by create visitor
     EquivBlueprint& addTerm(Blueprint::UP term, double exactness);
@@ -27,9 +26,8 @@ public:
     SearchIteratorUP createLeafSearch(const fef::TermFieldMatchDataArray &tfmda, bool strict) const override;
 
     void visitMembers(vespalib::ObjectVisitor &visitor) const override;
-    void fetchPostings(bool strict) override;
+    void fetchPostings(bool strict, const BitVector * filter) override;
     bool isEquiv() const override { return true; }
 };
 
-} // namespace queryeval
-} // namespace search
+}

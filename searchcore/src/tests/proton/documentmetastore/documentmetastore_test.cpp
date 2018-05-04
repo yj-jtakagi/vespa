@@ -202,7 +202,7 @@ assertWhiteList(const SimpleResult &exp, Blueprint::UP whiteListBlueprint, bool 
 {
     MatchDataLayout mdl;
     MatchData::UP md = mdl.createMatchData();
-    whiteListBlueprint->fetchPostings(strict);
+    whiteListBlueprint->fetchPostings(strict, nullptr);
     whiteListBlueprint->setDocIdLimit(docIdLimit);
 
     SearchIterator::UP sb = whiteListBlueprint->createSearch(*md, strict);

@@ -201,7 +201,7 @@ Result do_search(IAttributeManager &attribute_manager, const Node &node, bool st
     Blueprint::UP bp = source.createBlueprint(requestContext, FieldSpec(field, fieldId, handle), node);
     ASSERT_TRUE(bp.get() != nullptr);
     Result result(bp->getState().estimate().estHits, bp->getState().estimate().empty);
-    bp->fetchPostings(strict);
+    bp->fetchPostings(strict, nullptr);
     SearchIterator::UP iterator = bp->createSearch(*match_data, strict);
     ASSERT_TRUE(iterator.get() != nullptr);
     iterator->initRange(1, num_docs);
