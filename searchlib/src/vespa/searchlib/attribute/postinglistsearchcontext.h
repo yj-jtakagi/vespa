@@ -121,7 +121,8 @@ protected:
 
     void fetchPostings(bool strict, const PreFilter * filter) override;
     // this will be called instead of the fetchPostings function in some cases
-    void diversify(bool forward, size_t wanted_hits, const IAttributeVector &diversity_attr,
+    void diversify(bool forward, size_t wanted_hits, const search::PreFilter * filter,
+                   const IAttributeVector &diversity_attr,
                    size_t max_per_group, size_t cutoff_groups, bool cutoff_strict);
 
     std::unique_ptr<queryeval::SearchIterator>
@@ -228,7 +229,7 @@ private:
         if (params().diversityAttribute() != nullptr) {
             bool forward = (this->getRangeLimit() > 0);
             size_t wanted_hits = std::abs(this->getRangeLimit());
-            PostingListSearchContextT<DataT>::diversify(forward, wanted_hits,
+            PostingListSearchContextT<DataT>::diversify(forward, wanted_hits, filter,
                                                         *(params().diversityAttribute()), this->getMaxPerGroup(),
                                                         params().diversityCutoffGroups(), params().diversityCutoffStrict());
         } else {

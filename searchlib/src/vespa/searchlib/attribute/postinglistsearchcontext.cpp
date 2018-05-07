@@ -6,11 +6,7 @@
 #include "diversity.hpp"
 #include <vespa/searchlib/btree/btreeiterator.hpp>
 
-
-
-namespace search {
-
-namespace attribute {
+namespace search::attribute {
 
 using btree::BTreeNode;
 
@@ -85,7 +81,4 @@ template class PostingListSearchContextT<int32_t>;
 template class PostingListFoldedSearchContextT<btree::BTreeNoLeafData>;
 template class PostingListFoldedSearchContextT<int32_t>;
 
-
-} // namespace attribute
-
-} // namespace search
+}

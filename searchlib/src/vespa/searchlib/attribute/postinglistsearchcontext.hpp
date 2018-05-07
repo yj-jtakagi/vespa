@@ -121,6 +121,7 @@ PostingListSearchContextT<DataT>::fetchPostings(bool strict, const PreFilter * f
     }
     if (strict && !fallbackToFiltering()) {
         size_t sum(countHits());
+        _merger.setPreFilter(filter);
         if (sum < _docIdLimit / 64) {
             _merger.reserveArray(_uniqueValues, sum);
             fillArray();
@@ -135,14 +136,16 @@ PostingListSearchContextT<DataT>::fetchPostings(bool strict, const PreFilter * f
 
 template <typename DataT>
 void
-PostingListSearchContextT<DataT>::diversify(bool forward, size_t wanted_hits, const IAttributeVector &diversity_attr,
+PostingListSearchContextT<DataT>::diversify(bool forward, size_t wanted_hits, const search::PreFilter * filter,
+                                            const IAttributeVector &diversity_attr,
                                             size_t max_per_group, size_t cutoff_groups, bool cutoff_strict)
 {
     assert(!_fetchPostingsDone);
     _fetchPostingsDone = true;
     _merger.reserveArray(128, wanted_hits);
     diversity::diversify(forward, _lowerDictItr, _upperDictItr, _postingList, wanted_hits, diversity_attr,
-                         max_per_group, cutoff_groups, cutoff_strict, _merger.getWritableArray(), _merger.getWritableStartPos());
+                         max_per_group, cutoff_groups, cutoff_strict,
+                         _merger.getWritableArray(), _merger.getWritableStartPos(), filter);
     _merger.merge();
 }
 

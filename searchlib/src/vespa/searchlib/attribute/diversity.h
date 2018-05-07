@@ -4,6 +4,7 @@
 
 #include "singleenumattribute.h"
 #include "singlenumericattribute.h"
+#include <vespa/searchlib/common/prefilter.h>
 #include <vespa/vespalib/stllike/hash_map.h>
 
 /**
@@ -157,17 +158,25 @@ template <typename DictRange, typename PostingStore, typename Fetcher, typename 
 void diversify_3(const DictRange &range_in, const PostingStore &posting, size_t wanted_hits,
                  const Fetcher &diversity, size_t max_per_group,
                  size_t cutoff_max_groups, bool cutoff_strict,
-                 Result &result, std::vector<size_t> &fragments)
+                 Result &result, std::vector<size_t> &fragments, const PreFilter * preFilter)
 {
+    (void) preFilter;
     DictRange range(range_in);
     using DataType = typename PostingStore::DataType;
     using KeyDataType = typename PostingStore::KeyDataType;
     DiversityFilter<Fetcher, Result> filter(diversity, max_per_group, cutoff_max_groups, cutoff_strict, result, wanted_hits);
     while (range.has_next() && (result.size() < wanted_hits)) {
         typename DictRange::Next dict_entry(range);
-        posting.foreach_frozen(dict_entry.get().getData(),
-                               [&](uint32_t key, const DataType &data)
-                               { filter.push_back(KeyDataType(key, data)); });
+        if (preFilter) {
+            posting.foreach_frozen(dict_entry.get().getData(),
+                                   [&](uint32_t key, const DataType &data)
+                                   { if (preFilter->keep(key)) { filter.push_back(KeyDataType(key, data)); }});
+        } else {
+            posting.foreach_frozen(dict_entry.get().getData(),
+                                   [&](uint32_t key, const DataType &data)
+                                   { filter.push_back(KeyDataType(key, data)); });
+        }
+
         if (fragments.back() < result.size()) {
             fragments.push_back(result.size());
         }
@@ -178,34 +187,34 @@ template <typename DictRange, typename PostingStore, typename Result>
 void diversify_2(const DictRange &range_in, const PostingStore &posting, size_t wanted_hits,
                  const IAttributeVector &diversity_attr, size_t max_per_group,
                  size_t cutoff_max_groups, bool cutoff_strict,
-                 Result &result, std::vector<size_t> &fragments)
+                 Result &result, std::vector<size_t> &fragments, const PreFilter * filter)
 {
     if (diversity_attr.hasEnum()) { // must handle enum first
         FetchEnumFast fastEnum(diversity_attr);
         if (fastEnum.valid()) {
-            diversify_3(range_in, posting, wanted_hits, fastEnum, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, fastEnum, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         } else {
-            diversify_3(range_in, posting, wanted_hits, FetchEnum(diversity_attr), max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, FetchEnum(diversity_attr), max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         }
     } else if (diversity_attr.isIntegerType()) {
         FetchNumberFast<SingleValueNumericAttribute<IntegerAttributeTemplate<int32_t> > > fastInt32(diversity_attr);
         FetchNumberFast<SingleValueNumericAttribute<IntegerAttributeTemplate<int64_t> > > fastInt64(diversity_attr);
         if (fastInt32.valid()) {
-            diversify_3(range_in, posting, wanted_hits, fastInt32, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, fastInt32, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         } else if (fastInt64.valid()) {
-            diversify_3(range_in, posting, wanted_hits, fastInt64, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, fastInt64, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         } else {
-            diversify_3(range_in, posting, wanted_hits, FetchInteger(diversity_attr), max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, FetchInteger(diversity_attr), max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         }
     } else if (diversity_attr.isFloatingPointType()) {
         FetchNumberFast<SingleValueNumericAttribute<FloatingPointAttributeTemplate<float> > > fastFloat(diversity_attr);
         FetchNumberFast<SingleValueNumericAttribute<FloatingPointAttributeTemplate<double> > > fastDouble(diversity_attr);
         if (fastFloat.valid()) {
-            diversify_3(range_in, posting, wanted_hits, fastFloat, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, fastFloat, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         } else if (fastDouble.valid()) {
-            diversify_3(range_in, posting, wanted_hits, fastDouble, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, fastDouble, max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         } else {
-            diversify_3(range_in, posting, wanted_hits, FetchFloat(diversity_attr), max_per_group, cutoff_max_groups, cutoff_strict, result, fragments);
+            diversify_3(range_in, posting, wanted_hits, FetchFloat(diversity_attr), max_per_group, cutoff_max_groups, cutoff_strict, result, fragments, filter);
         }
     }
 }
@@ -214,14 +223,14 @@ template <typename DictItr, typename PostingStore, typename Result>
 void diversify(bool forward, const DictItr &lower, const DictItr &upper, const PostingStore &posting, size_t wanted_hits,
                const IAttributeVector &diversity_attr, size_t max_per_group,
                size_t cutoff_max_groups, bool cutoff_strict,
-               Result &array, std::vector<size_t> &fragments)
+               Result &array, std::vector<size_t> &fragments, const PreFilter * filter)
 {
     if (forward) {
         diversify_2(ForwardRange<DictItr>(lower, upper), posting, wanted_hits,
-                    diversity_attr, max_per_group, cutoff_max_groups, cutoff_strict, array, fragments);
+                    diversity_attr, max_per_group, cutoff_max_groups, cutoff_strict, array, fragments, filter);
     } else {
         diversify_2(ReverseRange<DictItr>(lower, upper), posting, wanted_hits,
-                    diversity_attr, max_per_group, cutoff_max_groups, cutoff_strict, array, fragments);
+                    diversity_attr, max_per_group, cutoff_max_groups, cutoff_strict, array, fragments, filter);
     }
 }
 

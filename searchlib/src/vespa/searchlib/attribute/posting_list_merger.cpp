@@ -9,15 +9,14 @@ PostingListMerger<DataT>::PostingListMerger(uint32_t docIdLimit)
     : _array(),
       _startPos(),
       _bitVector(),
+      _preFilter(nullptr),
       _docIdLimit(docIdLimit),
       _arrayValid(false)
 {
 }
 
 template <typename DataT>
-PostingListMerger<DataT>::~PostingListMerger()
-{
-}
+PostingListMerger<DataT>::~PostingListMerger() = default;
 
 template <typename DataT>
 void

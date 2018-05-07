@@ -4,6 +4,7 @@
 
 #include <vespa/searchlib/btree/btree_key_data.h>
 #include <vespa/searchlib/common/bitvector.h>
+#include <vespa/searchlib/common/prefilter.h>
 #include <vespa/vespalib/util/arrayref.h>
 
 namespace search::attribute {
@@ -19,11 +20,12 @@ class PostingListMerger
     using PostingVector = std::vector<Posting>;
     using StartVector = std::vector<size_t>;
 
-    PostingVector  _array;
-    StartVector    _startPos;
+    PostingVector              _array;
+    StartVector                _startPos;
     std::shared_ptr<BitVector> _bitVector;
-    uint32_t       _docIdLimit;
-    bool           _arrayValid;
+    const search::PreFilter   *_preFilter;
+    uint32_t                   _docIdLimit;
+    bool                       _arrayValid;
 
     PostingVector &merge(PostingVector &v, PostingVector &temp, const StartVector &startPos) __attribute__((noinline));
 public:
@@ -31,6 +33,7 @@ public:
 
     ~PostingListMerger();
 
+    void setPreFilter(const search::PreFilter *filter) { _preFilter = filter; }
     void reserveArray(uint32_t postingsCount, size_t postingsSize);
     void allocBitVector();
     void merge();
@@ -46,8 +49,13 @@ public:
     void addToArray(const PostingListType & postingList)
     {
         PostingVector &array = _array;
-        postingList.foreach([&array](uint32_t key, const DataT &data)
-                            { array.emplace_back(key, data); });
+        if (_preFilter) {
+            postingList.foreach([&array, filter=_preFilter](uint32_t key, const DataT &data)
+                                { if (filter->keep(key)) { array.emplace_back(key, data); }} );
+        } else {
+            postingList.foreach([&array](uint32_t key, const DataT &data)
+                                { array.emplace_back(key, data); });
+        }
         if (_startPos.back() < array.size()) {
             _startPos.push_back(array.size());
         }
@@ -58,8 +66,13 @@ public:
     {
         BitVector &bv = *_bitVector;
         uint32_t limit = _docIdLimit;
-        postingList.foreach_key([&bv, limit](uint32_t key)
-                                { if (__builtin_expect(key < limit, true)) { bv.setBit(key); } });
+        if (_preFilter) {
+            postingList.foreach_key([&bv, limit, filter=_preFilter](uint32_t key)
+                                    { if (filter->keep(key) && __builtin_expect(key < limit, true)) { bv.setBit(key); } });
+        } else {
+            postingList.foreach_key([&bv, limit](uint32_t key)
+                                    { if (__builtin_expect(key < limit, true)) { bv.setBit(key); } });
+        }
     }
 
     // Until diversity handling has been rewritten

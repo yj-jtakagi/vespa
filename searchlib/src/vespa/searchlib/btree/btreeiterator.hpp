@@ -7,8 +7,7 @@
 #include "btreenode.hpp"
 #include <vespa/vespalib/stllike/asciistream.h>
 
-namespace search {
-namespace btree {
+namespace search::btree {
 
 #define STRICT_BTREE_ITERATOR_SEEK
 
@@ -1375,6 +1374,4 @@ BTreeIterator<KeyT, DataT, AggrT, CompareT, TraitsT>::adjustGivenEntriesToRightL
     }
 }
 
-} // namespace search::btree
-} // namespace search
-
+}
