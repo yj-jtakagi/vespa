@@ -2,6 +2,8 @@
 
 #include "match_phase_limiter.h"
 #include <vespa/searchlib/queryeval/andsearchstrict.h>
+#include <vespa/searchlib/queryeval/andnotsearch.h>
+#include <vespa/searchlib/queryeval/ranksearch.h>
 #include <vespa/log/log.h>
 
 LOG_SETUP(".proton.matching.match_phase_limiter");
@@ -91,30 +93,28 @@ MatchPhaseLimiter::MatchPhaseLimiter(uint32_t docIdLimit,
 namespace {
 
 const search::BitVector *
-preFilterUnderAnd(const SearchIterator & search) {
+findPotentialPreFilter(const SearchIterator &search) {
     const search::BitVector *filter = search.precomputedBitVector();
     if (filter != nullptr) {
         return filter;
     }
-        const search::queryeval::AndSearch * andSearch = dynamic_cast<const search::queryeval::AndSearch *>(&search);
-        if (andSearch) {
-            for (const SearchIterator * child : andSearch->getChildren()) {
-                filter = preFilterUnderAnd(*child);
-                if (filter != nullptr) {
-                    return filter;
-                }
-            }
+    const search::queryeval::MultiSearch * multiSearch = dynamic_cast<const search::queryeval::MultiSearch *>(&search);
+    if (multiSearch) {
+        if (multiSearch->isAndNot()) {
+            return findPotentialPreFilter(*static_cast<const search::queryeval::AndNotSearch *>(multiSearch)->positive());
+        } else if (multiSearch->isRank()) {
+            return findPotentialPreFilter(*static_cast<const search::queryeval::RankSearch *>(multiSearch)->mandatory());
         }
+    }
 
-    return filter;
+    return nullptr;
 }
 
 template <bool PRE_FILTER>
 SearchIterator::UP
-do_limit(bool enablePreFilter, AttributeLimiter &limiter_factory, SearchIterator::UP search,
+do_limit(const search::BitVector * filter, AttributeLimiter &limiter_factory, SearchIterator::UP search,
          size_t wanted_num_docs, size_t max_group_size, uint32_t current_id, uint32_t end_id)
 {
-    const search::BitVector * filter = enablePreFilter ? preFilterUnderAnd(*search) : nullptr;
     SearchIterator::UP limiter = limiter_factory.create_search(filter, wanted_num_docs, max_group_size, PRE_FILTER);
     limiter = search->andWith(std::move(limiter), wanted_num_docs);
     if (limiter) {
@@ -130,7 +130,8 @@ SearchIterator::UP
 MatchPhaseLimiter::maybe_limit(SearchIterator::UP search,
                                double match_freq, size_t num_docs)
 {
-    size_t wanted_num_docs = _calculator.wanted_num_docs(match_freq);
+    const search::BitVector * filter = _enablePreFilter ? findPotentialPreFilter(*search) : nullptr;
+    size_t wanted_num_docs = filter ? _calculator.max_hits() : _calculator.wanted_num_docs(match_freq);
     size_t max_filter_docs = static_cast<size_t>(num_docs * _maxFilterCoverage);
     size_t upper_limited_corpus_size = std::min(num_docs, max_filter_docs);
     if (upper_limited_corpus_size <= wanted_num_docs) {
@@ -147,9 +148,10 @@ MatchPhaseLimiter::maybe_limit(SearchIterator::UP search,
         " max_group_size=%zu, current_docid=%u, end_docid=%u, total_query_hits=%ld",
         use_pre_filter ? "pre" : "post", match_freq, num_docs, max_filter_docs, wanted_num_docs,
         max_group_size, current_id, end_id, total_query_hits);
+
     return (use_pre_filter)
-        ? do_limit<true>(_enablePreFilter, _limiter_factory, std::move(search), wanted_num_docs, max_group_size, current_id, end_id)
-        : do_limit<false>(_enablePreFilter, _limiter_factory, std::move(search), wanted_num_docs, max_group_size, current_id, end_id);
+        ? do_limit<true>(filter, _limiter_factory, std::move(search), wanted_num_docs, max_group_size, current_id, end_id)
+        : do_limit<false>(filter, _limiter_factory, std::move(search), wanted_num_docs, max_group_size, current_id, end_id);
 }
 
 void

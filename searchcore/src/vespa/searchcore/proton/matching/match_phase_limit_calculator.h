@@ -43,6 +43,8 @@ public:
     size_t max_group_size(size_t wanted_num_docs_in) const {
         return (wanted_num_docs_in / _min_groups);
     }
+
+    size_t max_hits() const { return _max_hits; }
 };
 
 }
