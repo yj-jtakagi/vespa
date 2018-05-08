@@ -4,8 +4,7 @@
 
 #include "multisearch.h"
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 /**
  * A simple implementation of the Rank search operation.
@@ -26,8 +25,8 @@ protected:
 public:
     // Caller takes ownership of the returned SearchIterator.
     static SearchIterator *create(const Children &children, bool strict);
+    SearchIterator * mandatory() const { return getChildren()[0]; }
+    bool isRank() const override { return true; }
 };
 
-} // namespace queryeval
-} // namespace search
-
+}

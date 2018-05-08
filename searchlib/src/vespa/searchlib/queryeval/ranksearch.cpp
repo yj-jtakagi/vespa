@@ -2,13 +2,12 @@
 
 #include "ranksearch.h"
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 void
 RankSearch::doSeek(uint32_t docid)
 {
-    SearchIterator & firstChild(**getChildren().begin());
+    SearchIterator & firstChild(*mandatory());
     if (firstChild.seek(docid)) {
         setDocId(docid);
     }
@@ -39,13 +38,13 @@ public:
 SearchIterator::UP
 RankSearchStrict::andWith(UP filter, uint32_t estimate)
 {
-    return getChildren()[0]->andWith(std::move(filter), estimate);
+    return mandatory()->andWith(std::move(filter), estimate);
 }
 
 void
 RankSearchStrict::doSeek(uint32_t docid)
 {
-    SearchIterator & firstChild(**getChildren().begin());
+    SearchIterator & firstChild(*mandatory());
     setDocId(firstChild.seek(docid) ? docid : firstChild.getDocId());
 }
 }  // namespace
@@ -59,5 +58,4 @@ RankSearch::create(const RankSearch::Children &children, bool strict) {
     }
 }
 
-}  // namespace queryeval
-}  // namespace search
+}

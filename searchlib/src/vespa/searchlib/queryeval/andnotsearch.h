@@ -7,8 +7,7 @@
 #include <vespa/searchlib/attribute/attributeiterators.h>
 #include <vespa/searchlib/attribute/singlesmallnumericattribute.h>
 
-namespace search {
-namespace queryeval {
+namespace search::queryeval {
 
 /**
  * A simple implementation of the AndNot search operation.
@@ -34,6 +33,7 @@ public:
 
     std::unique_ptr<BitVector> get_hits(uint32_t begin_id) override;
     void or_hits_into(BitVector &result, uint32_t begin_id) override;
+    SearchIterator * positive() const { return getChildren()[0]; }
 
 private:
     bool isAndNot() const override { return true; }
@@ -71,7 +71,6 @@ public:
     }
     void initRange(uint32_t beginid, uint32_t endid) override;
 private:
-    SearchIterator * positive() { return getChildren()[0]; }
     BlackListIterator * blackList() { return static_cast<BlackListIterator *>(getChildren()[1]); }
     template<bool doSeekOnly>
     uint32_t internalSeek(uint32_t docid) {
@@ -97,6 +96,5 @@ private:
     void doUnpack(uint32_t docid) override;
 };
 
-} // namespace queryeval
-} // namespace search
+}
 

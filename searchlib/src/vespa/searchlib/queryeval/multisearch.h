@@ -37,6 +37,7 @@ public:
     virtual bool isAnd() const { return false; }
     virtual bool isAndNot() const { return false; }
     virtual bool isOr() const { return false; }
+    virtual bool isRank() const { return false; }
     void insert(size_t index, SearchIterator::UP search);
     virtual bool needUnpack(size_t index) const { (void) index; return true; }
     void initRange(uint32_t beginId, uint32_t endId) override;
