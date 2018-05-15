@@ -197,8 +197,6 @@
                 jackson-databind-${jackson2.version}.jar,
                 jackson-datatype-jdk8-${jackson2.version}.jar,
                 jackson-datatype-jsr310-${jackson2.version}.jar,
-                jackson-jaxrs-base-${jackson2.version}.jar,
-                jackson-jaxrs-json-provider-${jackson2.version}.jar,
                 jackson-module-jaxb-annotations-${jackson2.version}.jar,
                 javassist-${javassist.version}.jar,
                 javax.ws.rs-api-${javax.ws.rs-api.version}.jar,
@@ -207,7 +205,7 @@
                 jersey-container-servlet-${jersey2.version}.jar,
                 jersey-container-servlet-core-${jersey2.version}.jar,
                 jersey-entity-filtering-${jersey2.version}.jar, <!-- new feature from 2.16, provided for convenience -->
-                jersey-guava-${jersey2.version}.jar,
+                jersey-hk2-${jersey2.version}.jar,
                 jersey-media-jaxb-${jersey2.version}.jar,
                 jersey-media-json-jackson-${jersey2.version}.jar,
                 jersey-media-multipart-${jersey2.version}.jar,

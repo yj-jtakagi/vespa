@@ -4,7 +4,6 @@ package com.yahoo.container.servlet.jersey;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.yahoo.container.di.componentgraph.Provider;
 import com.yahoo.container.di.config.RestApiContext;
 import com.yahoo.container.di.config.RestApiContext.BundleInfo;
@@ -18,6 +17,12 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.objectweb.asm.ClassReader;
+
+/* Despite its name, this package is exported from jersey-media-json-jackson.
+ * Probably more like 'repackaged' than 'internal'.
+ * See also https://github.com/jersey/jersey/commit/2314a6c98b52c8c5da6995dd12ad539c3434f526
+ */
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,7 +108,9 @@ public class JerseyServletProvider implements Provider<ServletHolder> {
 
     private static JacksonJaxbJsonProvider jacksonDatatypeJdk8Provider() {
         JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
-        provider.setMapper(new ObjectMapper().registerModule(new Jdk8Module()).registerModule(new JavaTimeModule()));
+        provider.setMapper(new ObjectMapper()
+                                   .registerModule(new Jdk8Module())
+                                   .registerModule(new JavaTimeModule()));
         return provider;
     }
 
