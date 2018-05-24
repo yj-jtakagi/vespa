@@ -3,15 +3,12 @@ package com.yahoo.graph;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Provides graph traversal algorithms in an ad-hoc manner.
@@ -100,15 +97,23 @@ public class Traversals {
         };
     }
 
-    public static <T> Function<T, Iterable<T>> reversed(Collection<T> nodes, Function<T, Iterable<T>> parents) {
+    /**
+     * Returns an edge set which is the reverse of the given one, restricted to the given node set.
+     *
+     * @param nodes The node set of the input and output graphs.
+     * @param edges The directed edge set for which to find a reverse.
+     * @param <T> The node type.
+     * @return The given edge set, but with all edges reversed.
+     */
+    public static <T> Function<T, Iterable<T>> reversed(Collection<T> nodes, Function<T, Iterable<T>> edges) {
         Map<T, List<T>> reverse = new HashMap<>();
         for (T node : nodes)
             reverse.put(node, new ArrayList<>());
 
         for (T node : nodes)
-            for (T parent : parents.apply(node))
-                if (reverse.containsKey(parent))
-                    reverse.get(parent).add(node);
+            for (T neighbour : edges.apply(node))
+                if (reverse.containsKey(neighbour))
+                    reverse.get(neighbour).add(node);
 
         return reverse::get;
     }
