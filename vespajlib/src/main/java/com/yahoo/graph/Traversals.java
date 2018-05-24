@@ -2,7 +2,6 @@ package com.yahoo.graph;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +25,7 @@ public class Traversals {
      * @param children A function mapping a node to its children.
      * @param <T> The node type.
      * @return A topologically ordered iterable over the given nodes.
-            */
+     */
     public static <T> Iterable<T> topologically(Iterable<T> nodes, Function<T, Iterable<T>> children) {
         return () -> new Iterator<T>() {
 
@@ -105,7 +104,7 @@ public class Traversals {
      * @param <T> The node type.
      * @return The given edge set, but with all edges reversed.
      */
-    public static <T> Function<T, Iterable<T>> reversed(Collection<T> nodes, Function<T, Iterable<T>> edges) {
+    public static <T> Function<T, Iterable<T>> reversed(Iterable<T> nodes, Function<T, Iterable<T>> edges) {
         Map<T, List<T>> reverse = new HashMap<>();
         for (T node : nodes)
             reverse.put(node, new ArrayList<>());
