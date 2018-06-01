@@ -516,6 +516,12 @@ public class YqlParser implements Parser {
         }
     }
     @NonNull
+    private Item buildTermSearchWithNoIndexCheck(OperatorNode<ExpressionOperator> ast) {
+        assertHasOperator(ast, ExpressionOperator.CONTAINS);
+        return instantiateLeafItem(getIndexUnChecked(ast.getArgument(0)), ast.getArgument(1));
+    }
+
+    @NonNull
     private Item instantiateSameElementItem(String field, OperatorNode<ExpressionOperator> ast) {
         assertHasFunctionName(ast, SAME_ELEMENT);
 
@@ -523,7 +529,7 @@ public class YqlParser implements Parser {
         // All terms below sameElement are relative to this.
         IndexNameExpander prev = swapIndexCreator(new PrefixExpander(field));
         for (OperatorNode<ExpressionOperator> term : ast.<List<OperatorNode<ExpressionOperator>>> getArgument(1)) {
-            sameElement.addItem(convertExpression(term));
+            sameElement.addItem(buildTermSearchWithNoIndexCheck(term));
         }
         swapIndexCreator(prev);
         return sameElement;
@@ -1631,6 +1637,11 @@ public class YqlParser implements Parser {
         String expanded = indexNameExpander.expand(index);
         Preconditions.checkArgument(indexFactsSession.isIndex(expanded), "Field '%s' does not exist.", expanded);
         return indexFactsSession.getCanonicName(index);
+    }
+
+    @NonNull
+    private String getIndexUnChecked(OperatorNode<ExpressionOperator> operatorNode) {
+        return fetchFieldRead(operatorNode);
     }
 
     private Substring getOrigin(OperatorNode<ExpressionOperator> ast) {
