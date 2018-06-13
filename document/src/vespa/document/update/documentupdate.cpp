@@ -303,11 +303,9 @@ DocumentUpdate::deserialize42(const DocumentTypeRepo& repo, vespalib::nbostream 
             stream >> sizeAndFlags;
             int numUpdates = deserializeFlags(sizeAndFlags);
             _updates.reserve(numUpdates);
-            ByteBuffer buffer(stream.peek(), stream.size());
             for (int i = 0; i < numUpdates; i++) {
-                _updates.emplace_back(repo, *typeAndId.first, buffer, _version);
+                _updates.emplace_back(repo, *typeAndId.first, stream, _version);
             }
-            stream.adjustReadPos(buffer.getPos());
         }
     } catch (const DeserializeException &) {
         stream.rp(pos);
@@ -358,11 +356,9 @@ DocumentUpdate::deserializeHEAD(const DocumentTypeRepo &repo, vespalib::nbostrea
             int numUpdates = 0;
             stream >> numUpdates;
             _updates.reserve(numUpdates);
-            ByteBuffer buffer(stream.peek(), stream.size());
             for (int i = 0; i < numUpdates; i++) {
-                _updates.emplace_back(repo, *docType, buffer, _version);
+                _updates.emplace_back(repo, *docType, stream, _version);
             }
-            stream.adjustReadPos(buffer.getPos());
         }
         // Read fieldpath updates, if any
         int sizeAndFlags = 0;
