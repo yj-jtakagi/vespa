@@ -127,6 +127,7 @@ public class JobController {
     public ApplicationVersion submit(ApplicationId id, SourceRevision revision,
                                      byte[] applicationPackage, byte[] applicationTestJar) {
         AtomicReference<ApplicationVersion> version = new AtomicReference<>();
+
         controller.applications().lockOrThrow(id, application -> {
             if ( ! application.get().deploymentJobs().builtInternally())
                 throw new IllegalArgumentException(id + " is not built here!");
