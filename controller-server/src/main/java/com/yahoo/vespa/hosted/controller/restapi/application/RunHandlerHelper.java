@@ -6,6 +6,7 @@ import com.yahoo.container.jdisc.HttpResponse;
 import com.yahoo.slime.Cursor;
 import com.yahoo.slime.Slime;
 import com.yahoo.vespa.hosted.controller.api.integration.deployment.JobType;
+import com.yahoo.vespa.hosted.controller.api.integration.deployment.RunId;
 import com.yahoo.vespa.hosted.controller.application.ApplicationVersion;
 import com.yahoo.vespa.hosted.controller.deployment.JobController;
 import com.yahoo.vespa.hosted.controller.deployment.RunDetails;
@@ -13,8 +14,6 @@ import com.yahoo.vespa.hosted.controller.deployment.RunStatus;
 import com.yahoo.vespa.hosted.controller.restapi.Path;
 import com.yahoo.vespa.hosted.controller.restapi.SlimeJsonResponse;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,50 +29,47 @@ import java.util.Map;
 public class RunHandlerHelper {
 
     /**
-     * @see JobType
-     *
-     * @return Response with all job types that have recorded runs for the application.
+     * @return Response with all job types that have recorded runs for the application and the status for the last run of that type
      */
-    public static HttpResponse createJobTypeResponse(List<JobType> jobTypes) {
+    public static HttpResponse createJobTypeResponse(Map<JobType, RunStatus> jobTypesWithLastStatus) {
         Slime slime = new Slime();
-        Cursor typesArray = slime.setArray();
-        Arrays.stream(JobType.values()).forEach(jobType -> typesArray.setString(jobType.jobName(), jobType.jobName()));
+        Cursor typesObject = slime.setObject();
+        jobTypesWithLastStatus.forEach((jobType, runStatus) -> toSlime(typesObject.setObject(jobType.jobName()), runStatus));
         return new SlimeJsonResponse(slime);
     }
 
     /**
-     * @see RunStatus
-     *
      * @return Response with the 10 last runs for a given jobtype
+     * @see RunStatus
      */
-    public static HttpResponse createRunStatusResponse(List<RunStatus> runStatuses) {
+    public static HttpResponse createRunStatusResponse(Map<RunId, RunStatus> runStatuses) {
         Slime slime = new Slime();
-        Cursor runArray = slime.setArray();
-        //TODO sort on last
-        runStatuses.stream().limit(10).forEach(runStatus -> toSlime(runArray, runStatus));
+        Cursor runsObject = slime.setObject();
+
+        //TODO sort on runid and limit to last 10
+        runStatuses.forEach((runid, runstatus) -> toSlime(runsObject.setObject((int) runid.number()), runstatus));
 
         //TODO add links to details
         return new SlimeJsonResponse(slime);
     }
 
-    private static void toSlime(Cursor jobArray, RunStatus runStatus) {
-        Cursor jobObject = jobArray.addObject();
-        jobObject.setLong("id", runStatus.id().number());
-        jobObject.setString("start", runStatus.start().toString());
+    private static void toSlime(Cursor runObject, RunStatus runStatus) {
 
-        Cursor statusArray = jobObject.addArray();
-        runStatus.status().forEach((step, status) -> {
+        runObject.setLong("id", runStatus.id().number());
+        runObject.setString("start", runStatus.start().toString());
+
+        Cursor statusArray = runObject.addArray();
+        runStatus.steps().forEach((step, status) -> {
             statusArray.setString(step.name(), status.name());
         });
 
-        runStatus.end().ifPresent(instant -> jobObject.setString("end", instant.toString()));
-        runStatus.result().ifPresent(result -> jobObject.setString("result", result.name()));
+        runStatus.end().ifPresent(instant -> runObject.setString("end", instant.toString()));
+        runStatus.result().ifPresent(result -> runObject.setString("result", result.name()));
     }
 
     /**
-     * @see RunDetails
-     *
      * @return Response with the details about a specific run
+     * @see RunDetails
      */
     public static HttpResponse createRunDetailsResponse(RunDetails runDetails) {
         Slime slime = new Slime();

@@ -65,6 +65,9 @@ public enum Step {
 
     public List<Step> prerequisites() { return prerequisites; }
 
+    public static Step last() {
+        return deactivateTester;
+    }
 
     public enum Status {
 

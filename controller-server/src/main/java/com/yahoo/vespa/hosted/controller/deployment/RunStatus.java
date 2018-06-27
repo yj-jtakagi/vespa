@@ -66,8 +66,19 @@ public class RunStatus {
 
     /** Returns the final result of this run, if it has ended. */
     public Optional<RunResult> result() {
-        // TODO jvenstad: To implement, or not ... If so, base on status.
-        throw new AssertionError();
+
+        // No result of not finished yet
+        if (!end.isPresent()) {
+            return Optional.empty();
+        }
+
+        // If any steps has failed - then we need to figure out what - for now return fixed error result
+        if (hasFailed()) {
+            // TODO find out failed reason
+            return Optional.of(RunResult.testError);
+        }
+
+        return Optional.of(RunResult.success);
     }
 
     /** Returns the instant at which this run began. */
