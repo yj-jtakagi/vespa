@@ -68,15 +68,10 @@ public class RunStatus {
     public Optional<RunResult> result() {
 
         // No result of not finished yet
-        if (!end.isPresent()) {
-            return Optional.empty();
-        }
+        if (!hasEnded()) return Optional.empty();
 
         // If any steps has failed - then we need to figure out what - for now return fixed error result
-        if (hasFailed()) {
-            // TODO find out failed reason
-            return Optional.of(RunResult.testError);
-        }
+        if (hasFailed()) return Optional.of(RunResult.testError);
 
         return Optional.of(RunResult.success);
     }

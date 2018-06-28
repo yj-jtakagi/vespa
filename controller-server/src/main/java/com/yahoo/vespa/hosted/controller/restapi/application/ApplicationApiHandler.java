@@ -64,6 +64,7 @@ import com.yahoo.vespa.hosted.controller.application.DeploymentJobs;
 import com.yahoo.vespa.hosted.controller.application.DeploymentMetrics;
 import com.yahoo.vespa.hosted.controller.application.JobStatus;
 import com.yahoo.vespa.hosted.controller.application.SourceRevision;
+import com.yahoo.vespa.hosted.controller.deployment.DeploymentSteps;
 import com.yahoo.vespa.hosted.controller.deployment.RunStatus;
 import com.yahoo.vespa.hosted.controller.restapi.ErrorResponse;
 import com.yahoo.vespa.hosted.controller.restapi.MessageResponse;
@@ -174,11 +175,11 @@ public class ApplicationApiHandler extends LoggingRequestHandler {
         if (path.matches("/application/v4/tenant/{tenant}/application/{application}"))
             return application(path.get("tenant"), path.get("application"), request);
         if (path.matches("/application/v4/tenant/{tenant}/application/{application}/instance/{instance}/job"))
-            return RunHandlerHelper.createJobTypeResponse(latestRuns(path));
+            return RunHandlerHelper.jobTypeResponse(jobTypes(path), latestRuns(path), request.getUri());
         if (path.matches("/application/v4/tenant/{tenant}/application/{application}/instance/{instance}/job/{jobtype}"))
-            return RunHandlerHelper.createRunStatusResponse(controller.jobController().runs(appIdFromPath(path), jobTypeFromPath(path)));
+            return RunHandlerHelper.runStatusResponse(controller.jobController().runs(appIdFromPath(path), jobTypeFromPath(path)), request.getUri());
         if (path.matches("/application/v4/tenant/{tenant}/application/{application}/instance/{instance}/job/{jobtype}/run/{number}"))
-            return RunHandlerHelper.createRunDetailsResponse(controller.jobController().details(runIdFromPath(path)));
+            return RunHandlerHelper.runDetailsResponse(controller.jobController().details(runIdFromPath(path)));
         if (path.matches("/application/v4/tenant/{tenant}/application/{application}/environment/{environment}/region/{region}/instance/{instance}"))
             return deployment(path.get("tenant"), path.get("application"), path.get("instance"), path.get("environment"), path.get("region"), request);
         if (path.matches("/application/v4/tenant/{tenant}/application/{application}/environment/{environment}/region/{region}/instance/{instance}/service"))
@@ -1242,6 +1243,13 @@ public class ApplicationApiHandler extends LoggingRequestHandler {
     private RunId runIdFromPath(Path path) {
         long number = Long.parseLong(path.get("number"));
         return new RunId(appIdFromPath(path), jobTypeFromPath(path), number);
+    }
+
+    private List<JobType> jobTypes(Path path) {
+        ApplicationId appId = appIdFromPath(path);
+        DeploymentSpec deploymentSpec = controller.applications().get(appId).get().deploymentSpec();
+        DeploymentSteps deploymentSteps = new DeploymentSteps(deploymentSpec, controller::system);
+        return deploymentSteps.jobs();
     }
 
     private Map<JobType, RunStatus> latestRuns(Path path) {

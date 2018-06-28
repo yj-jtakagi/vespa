@@ -20,4 +20,15 @@ public class RunDetails {
         this.testLog = testLog;
     }
 
+    public PrepareResponse getDeploymentResult() {
+        return deploymentResult;
+    }
+
+    public String getConvergenceLog() {
+        return convergenceLog;
+    }
+
+    public String getTestLog() {
+        return testLog;
+    }
 }
