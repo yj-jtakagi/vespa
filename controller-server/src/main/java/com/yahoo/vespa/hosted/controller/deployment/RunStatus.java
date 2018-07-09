@@ -59,7 +59,9 @@ public class RunStatus {
         return id;
     }
 
-    /** Returns an unmodifiable view of the status of all steps in this run. */
+    /** Returns an unmodifiable view of the status of all steps in this run.
+     * TODO maybe reflect in the signature that the map is a EnumMap or at least behaves as a sorted map?
+     * */
     public Map<Step, Step.Status> steps() {
         return steps;
     }

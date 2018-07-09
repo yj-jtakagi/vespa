@@ -3,16 +3,17 @@ package com.yahoo.vespa.hosted.controller.restapi.application;
 import com.yahoo.config.provision.ApplicationId;
 import com.yahoo.container.jdisc.HttpRequest;
 import com.yahoo.container.jdisc.HttpResponse;
-
 import com.yahoo.slime.Cursor;
 import com.yahoo.slime.Slime;
+import com.yahoo.vespa.hosted.controller.api.application.v4.model.configserverbindings.RefeedAction;
+import com.yahoo.vespa.hosted.controller.api.application.v4.model.configserverbindings.RestartAction;
+import com.yahoo.vespa.hosted.controller.api.integration.LogStore;
+import com.yahoo.vespa.hosted.controller.api.integration.configserver.PrepareResponse;
 import com.yahoo.vespa.hosted.controller.api.integration.deployment.JobType;
 import com.yahoo.vespa.hosted.controller.api.integration.deployment.RunId;
 import com.yahoo.vespa.hosted.controller.application.ApplicationVersion;
 import com.yahoo.vespa.hosted.controller.application.SourceRevision;
-import com.yahoo.vespa.hosted.controller.deployment.DeploymentSteps;
 import com.yahoo.vespa.hosted.controller.deployment.JobController;
-import com.yahoo.vespa.hosted.controller.deployment.RunDetails;
 import com.yahoo.vespa.hosted.controller.deployment.RunStatus;
 import com.yahoo.vespa.hosted.controller.restapi.Path;
 import com.yahoo.vespa.hosted.controller.restapi.SlimeJsonResponse;
@@ -21,21 +22,18 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * Helper class that implements the REST API for the job controller. This API is part of the Application API.
- * <p>
- * A run is an instance of a @JobType that deploys and test the application package in one zone or test context (eg stage or prod.us-east-3)
- * <p>
- * A submission is a new application package accompanied by a test jar provided by a 3rd party system or from a user directly.
- * <p>
+ * Implements the REST API for the job controller delegated from the Application API.
  *
  * @see JobController
+ * @see ApplicationApiHandler
  */
-public class RunHandlerHelper {
+public class JobControllerApiHandlerHelper {
 
     /**
-     * @return Response with all job types that have recorded runs for the application and the status for the last run of that type
+     * @return Response with all job types that have recorded runs for the application _and_ the status for the last run of that type
      */
     public static HttpResponse jobTypeResponse(List<JobType> sortedJobs, Map<JobType, RunStatus> lastStatus, URI baseUriForJobs) {
         Slime slime = new Slime();
@@ -63,8 +61,7 @@ public class RunHandlerHelper {
     }
 
     /**
-     * @return Response with the 10 last runs for a given jobtype
-     * @see RunStatus
+     * @return Response with the runstatuses for a specific jobtype
      */
     public static HttpResponse runStatusResponse(Map<RunId, RunStatus> runStatuses, URI baseUriForJobType) {
         Slime slime = new Slime();
@@ -72,7 +69,6 @@ public class RunHandlerHelper {
 
         runStatuses.forEach((runid, runstatus) -> runStatusToSlime(cursor.setObject(Long.toString(runid.number())), runstatus, baseUriForJobType));
 
-        //TODO add links to details
         return new SlimeJsonResponse(slime);
     }
 
@@ -81,32 +77,67 @@ public class RunHandlerHelper {
         runStatus.result().ifPresent(result -> cursor.setString("result", result.name()));
         runStatus.end().ifPresent(instant -> cursor.setString("end", instant.toString()));
 
-        Cursor statusObject = cursor.setObject("steps");
+        Cursor stepsArray = cursor.setArray("steps");
         runStatus.steps().forEach((step, status) -> {
-            statusObject.setString(step.name(), status.name());
+            Cursor stepObject = stepsArray.addObject();
+            stepObject.setString(step.name(), status.name());
         });
 
         cursor.setString("start", runStatus.start().toString());
         cursor.setLong("id", runStatus.id().number());
-        String detailsPath = baseUriForJobType.getPath() + "/run/" + runStatus.id().number();
-        cursor.setString("details", baseUriForJobType.resolve(detailsPath).toString());
+        String logsPath = baseUriForJobType.getPath() + "/run/" + runStatus.id().number();
+        cursor.setString("logs", baseUriForJobType.resolve(logsPath).toString());
     }
 
     /**
-     * @return Response with the details about a specific run
-     * @see RunDetails
+     * @return Response with logs from a single run
      */
-    public static HttpResponse runDetailsResponse(RunDetails runDetails) {
+    public static HttpResponse logStoreResponse(LogStore logStore, RunId runId) {
         Slime slime = new Slime();
-        Cursor jobDetailsObject = slime.setObject();
+        Cursor logsObject = slime.setObject();
 
-        // TODO complete this
-        Cursor prepObject = jobDetailsObject.setObject("deployment");
+        logsObject.setString("convergence", logStore.getConvergenceLog(runId));
 
-        jobDetailsObject.setString("convergenceLog", runDetails.getConvergenceLog());
-        jobDetailsObject.setString("testlog", runDetails.getTestLog());
+        logsObject.setString("test", logStore.getTestLog(runId));
+
+        Cursor deployCursor = logsObject.setObject("deploy");
+        prepareResponseToSlime(deployCursor, logStore.getPrepareResponse(runId));
 
         return new SlimeJsonResponse(slime);
+    }
+
+    private static void prepareResponseToSlime(Cursor cursor, PrepareResponse prepareResponse) {
+
+        cursor.setString("log", prepareResponse.log.stream()
+                .map(a -> a.level + "\t" + a.time + "\t" + a.message)
+                .collect(Collectors.joining("\n")));
+
+        cursor.setString("message", prepareResponse.message);
+
+        Cursor configCursor = cursor.setObject("config");
+
+        // Refeed
+        Cursor refeedCursor = configCursor.setArray("refeed");
+        for (RefeedAction refeedAction : prepareResponse.configChangeActions.refeedActions) {
+            Cursor refeedObject = refeedCursor.addObject();
+            refeedObject.setString("clustername", refeedAction.clusterName);
+            refeedObject.setString("documenttype", refeedAction.documentType);
+            refeedObject.setString("name", refeedAction.name);
+            refeedObject.setBool("allowed", refeedAction.allowed);
+            refeedObject.setString("message", refeedAction.messages.stream().collect(Collectors.joining("\n")));
+            refeedObject.setString("services", refeedAction.services.stream().map(s -> s.serviceName).collect(Collectors.joining("\n")));
+        }
+
+        // Restart
+        Cursor restartCursor = configCursor.setArray("restart");
+        for (RestartAction action : prepareResponse.configChangeActions.restartActions) {
+            Cursor restartObject = restartCursor.addObject();
+            restartObject.setString("clustername", action.clusterName);
+            restartObject.setString("clustertype", action.clusterType);
+            restartObject.setString("servicetype", action.serviceType);
+            restartObject.setString("message", action.messages.stream().collect(Collectors.joining("\n")));
+            restartObject.setString("services", action.services.stream().map(s -> s.serviceName).collect(Collectors.joining("\n")));
+        }
     }
 
     /**
@@ -115,7 +146,7 @@ public class RunHandlerHelper {
      *
      * @return Response with the new application version
      */
-    public static HttpResponse submitAndRespond(JobController jobController, HttpRequest request) {
+    public static HttpResponse submitResponse(JobController jobController, HttpRequest request) {
 
         Map<String, byte[]> dataParts = new MultipartParser().parse(request);
 
