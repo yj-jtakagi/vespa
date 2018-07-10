@@ -118,7 +118,7 @@ public class JobController {
     }
 
     /** Registers the given application, such that it may have deployment jobs run here. */
-    void register(ApplicationId id) {
+    public void register(ApplicationId id) {
         controller.applications().lockIfPresent(id, application ->
                 controller.applications().store(application.withBuiltInternally(true)));
     }
@@ -183,7 +183,7 @@ public class JobController {
     private void notifyOfNewSubmission(ApplicationId id, SourceRevision revision, long number) {
         DeploymentJobs.JobReport report = new DeploymentJobs.JobReport(id,
                                                                        JobType.component,
-                                                                       0,
+                                                                       1,
                                                                        number,
                                                                        Optional.of(revision),
                                                                        Optional.empty());

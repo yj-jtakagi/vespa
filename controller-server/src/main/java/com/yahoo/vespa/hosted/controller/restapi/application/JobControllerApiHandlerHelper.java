@@ -146,26 +146,15 @@ public class JobControllerApiHandlerHelper {
      *
      * @return Response with the new application version
      */
-    public static HttpResponse submitResponse(JobController jobController, HttpRequest request) {
+    public static HttpResponse submitResponse(JobController jobController, String tenant, String application, Map<String, String> propMap, byte[] appPackage, byte[] testPackage) {
 
-        Map<String, byte[]> dataParts = new MultipartParser().parse(request);
+        String repo = propMap.getOrDefault("repository", "NA");
+        String branch = propMap.getOrDefault("branch", "NA");
+        String commit = propMap.getOrDefault("commit", "NA");
+        SourceRevision sourceRevision = new SourceRevision(repo, branch, commit);
 
-        byte[] applicationPackage = dataParts.get("applicationZip");
-        byte[] applicationTestPackage = dataParts.get("applicationTestPackage");
-
-        Path path = new Path(request.getUri().getPath());
-        ApplicationId appId = ApplicationId.from(path.get("tenant"), path.get("application"), "default");
-
-
-        SourceRevision sourceRevision = new SourceRevision("NA", "NA", "NA");
-        String repo = request.getProperty("repository");
-        String branch = request.getProperty("branch");
-        String commit = request.getProperty("commit");
-        if (repo != null && branch != null && commit != null) {
-            sourceRevision = new SourceRevision(repo, branch, commit);
-        }
-
-        ApplicationVersion version = jobController.submit(appId, sourceRevision, applicationPackage, applicationTestPackage);
+        ApplicationVersion version = jobController.submit(ApplicationId.from(tenant, application, "default"),
+                sourceRevision, appPackage, testPackage);
 
         Slime slime = new Slime();
         Cursor responseObject = slime.setObject();

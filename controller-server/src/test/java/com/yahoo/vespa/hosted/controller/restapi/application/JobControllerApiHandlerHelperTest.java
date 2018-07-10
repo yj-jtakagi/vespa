@@ -1,11 +1,19 @@
 package com.yahoo.vespa.hosted.controller.restapi.application;
 
 import com.yahoo.config.provision.ApplicationId;
+import com.yahoo.config.provision.TenantName;
+import com.yahoo.container.jdisc.HttpRequest;
 import com.yahoo.container.jdisc.HttpResponse;
+import com.yahoo.processing.Request;
+import com.yahoo.vespa.athenz.api.AthenzDomain;
+import com.yahoo.vespa.athenz.api.NToken;
+import com.yahoo.vespa.hosted.controller.Controller;
+import com.yahoo.vespa.hosted.controller.ControllerTester;
 import com.yahoo.vespa.hosted.controller.api.application.v4.model.configserverbindings.ConfigChangeActions;
 import com.yahoo.vespa.hosted.controller.api.application.v4.model.configserverbindings.RefeedAction;
 import com.yahoo.vespa.hosted.controller.api.application.v4.model.configserverbindings.RestartAction;
 import com.yahoo.vespa.hosted.controller.api.application.v4.model.configserverbindings.ServiceInfo;
+import com.yahoo.vespa.hosted.controller.api.identifiers.Property;
 import com.yahoo.vespa.hosted.controller.api.identifiers.TenantId;
 import com.yahoo.vespa.hosted.controller.api.integration.LogStore;
 import com.yahoo.vespa.hosted.controller.api.integration.configserver.Log;
@@ -13,8 +21,12 @@ import com.yahoo.vespa.hosted.controller.api.integration.configserver.PrepareRes
 import com.yahoo.vespa.hosted.controller.api.integration.deployment.JobType;
 import com.yahoo.vespa.hosted.controller.api.integration.deployment.RunId;
 import com.yahoo.vespa.hosted.controller.api.integration.stubs.MockLogStore;
+import com.yahoo.vespa.hosted.controller.deployment.JobController;
 import com.yahoo.vespa.hosted.controller.deployment.RunStatus;
 import com.yahoo.vespa.hosted.controller.deployment.Step;
+import com.yahoo.vespa.hosted.controller.restapi.Path;
+import com.yahoo.vespa.hosted.controller.tenant.AthenzTenant;
+import com.yahoo.vespa.hosted.controller.tenant.UserTenant;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -391,7 +403,15 @@ public class JobControllerApiHandlerHelperTest {
 
     @Test
     public void submitResponse() {
-        JobControllerApiHandlerHelper.submitResponse(null, null);
+        ControllerTester tester = new ControllerTester();
+        tester.createTenant("tenant", "domain", 1l);
+        tester.createApplication(TenantName.from("tenant"), "application", "default", 1l);
+
+        JobController jobController = new JobController(tester.controller(), new MockLogStore());
+        jobController.register(ApplicationId.from("tenant", "application", "default"));
+
+        HttpResponse response = JobControllerApiHandlerHelper.submitResponse(jobController, "tenant", "application", Collections.emptyMap(), new byte[0], new byte[0]);
+        compare(response, "{\"version\":\"1.0.1-NA\"}");
     }
 
 
