@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2017 Yahoo Holdings. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.yahoo.vespa</groupId>
+    <artifactId>vespa-java</artifactId>
+    <packaging>pom</packaging>
+    <version>6-SNAPSHOT</version>
+    <description>Aggregator pom for vespa-java.</description>
+    <url>https://github.com/vespa-engine</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Vespa</name>
+            <url>https://github.com/vespa-engine</url>
+        </developer>
+    </developers>
+
+    <modules>
+        <module>../yolean</module>
+    </modules>
+</project>

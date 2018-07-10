@@ -125,11 +125,11 @@
         <module>vespa_feed_perf</module>
         <module>vespa-hadoop</module>
         <module>vespa-http-client</module>
+        <module>vespa-java</module>
         <module>vespa_jersey2</module>
         <module>vespajlib</module>
         <module>vespalog</module>
         <module>vsm</module>
-        <module>yolean</module>
         <module>zkfacade</module>
     </modules>
 </project>
