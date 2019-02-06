@@ -52,4 +52,14 @@ public class MemoryNameService implements NameService {
     public void removeRecord(RecordId id) {
         records.remove(id);
     }
+
+    @Override
+    public RecordId createRotationRecord(RecordName alias, List<RotationData> data) {
+        return null;
+    }
+
+    @Override
+    public void updateRotationRecord(RecordId recordId, RecordName alias, List<RotationData> data) {
+
+    }
 }

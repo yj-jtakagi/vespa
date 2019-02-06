@@ -30,4 +30,9 @@ public interface NameService {
     /** Remove record by ID */
     void removeRecord(RecordId id);
 
+    /** Create a global record */
+    RecordId createRotationRecord(RecordName alias, List<RotationData> data);
+
+    /** Update a global record */
+    void updateRotationRecord(RecordId recordId, RecordName alias, List<RotationData> data);
 }
