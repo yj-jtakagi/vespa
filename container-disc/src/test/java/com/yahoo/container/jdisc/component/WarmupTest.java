@@ -23,10 +23,10 @@ import static org.hamcrest.CoreMatchers.is;
 public class WarmupTest {
 
     static class TestHandler extends ThreadedHttpRequestHandler implements RequestHandler {
-        public boolean throwException;
-        public int nRequests;
+        boolean throwException;
+        int nRequests;
 
-        public TestHandler(boolean throwException) {
+        TestHandler(boolean throwException) {
             super(Executors.newSingleThreadExecutor());
             this.throwException = throwException;
             nRequests = 0;
@@ -34,66 +34,73 @@ public class WarmupTest {
 
         @Override
         public HttpResponse handle(HttpRequest request) {
-            nRequests++;
+            synchronized (this) {
+                nRequests++;
+            }
             if (throwException)
                 throw new RuntimeException("Nah did not work out");
 
             return new HttpResponse(200) {
                 @Override
                 public void render(OutputStream outputStream) throws IOException {
-
                 }
             };
         }
     }
 
+    private static VipStatus status = new VipStatus();
 
     @Test
-    public void test_happy_path() {
-        VipStatus status = new VipStatus();
+    public void test_warmup_all_good() {
+        Warmup.setInvoked(false);
         RequestHandler handler = new TestHandler(false);
-        Map<ComponentId,RequestHandler>  componentMap = getComponentMap(handler);
-        assertThat(status.isInRotation(), is(true));
-        new Warmup(status,getConfig("https://*/search/"),componentMap);
-        assertThat(status.isInRotation(), is(true));
-        assertThat(((TestHandler) handler).nRequests,is(Warmup.REQUESTS));
+        new Warmup(status, getConfig("https://*/search/"),
+                getComponentMap(handler));
+        assertThat(((TestHandler) handler).nRequests, is(Warmup.REQUESTS));
+       
+    }
+
+    @Test
+    public void test_no_warmup_if_in_rotation() {
+        Warmup.setInvoked(true);
+        TestHandler handler = new TestHandler(false);
+        new Warmup(status, getConfig("https://*/search/"),
+                getComponentMap(handler));
+        assertThat(handler.nRequests, is(0));
     }
 
     @Test
     public void test_exception_during_warmup() {
-        VipStatus status = new VipStatus();
-        RequestHandler handler = new TestHandler(true);
-        Map<ComponentId,RequestHandler>  componentMap = getComponentMap(handler);
-        assertThat(status.isInRotation(), is(true));
-        new Warmup(status,getConfig("https://*/search/"),componentMap);
-        assertThat(status.isInRotation(), is(true));
-        assertThat(((TestHandler) handler).nRequests,is(Warmup.REQUESTS));
+        Warmup.setInvoked(false);
+        TestHandler handler = new TestHandler(true);
+        new Warmup(status, getConfig("https://*/search/"),
+                getComponentMap(handler));
+        assertThat(handler.nRequests, is(Warmup.REQUESTS));
     }
 
     @Test
     public void test_no_search_binding() {
-        VipStatus status = new VipStatus();
-        RequestHandler handler = new TestHandler(false);
-        Map<ComponentId,RequestHandler>  componentMap = getComponentMap(handler);
-        assertThat(status.isInRotation(), is(true));
-        new Warmup(status,getConfig("https://*/somethings/"),componentMap);
-        assertThat(status.isInRotation(), is(true));
-        assertThat(((TestHandler) handler).nRequests,is(0));
+        Warmup.setInvoked(false);
+        status.setInRotation(false);
+        TestHandler handler = new TestHandler(false);
+        new Warmup(status, getConfig("https://*/somethings/"),
+                getComponentMap(handler));
+        assertThat(handler.nRequests, is(0));
     }
 
 
-
     JdiscBindingsConfig getConfig(String binding) {
-        return  new JdiscBindingsConfig(new JdiscBindingsConfig.Builder()
+        return new JdiscBindingsConfig(new JdiscBindingsConfig.Builder()
                 .handlers("TestHandler", new JdiscBindingsConfig.Handlers.Builder()
                         .serverBindings(binding)
                 ));
     }
 
-    Map<ComponentId,RequestHandler> getComponentMap(RequestHandler requestHandler) {
+    Map<ComponentId, RequestHandler> getComponentMap(RequestHandler requestHandler) {
         Map<ComponentId, RequestHandler> componentIdMap = new HashMap<>();
         ComponentId id = new ComponentId("TestHandler");
         componentIdMap.put(id, requestHandler);
         return componentIdMap;
     }
+
 }
