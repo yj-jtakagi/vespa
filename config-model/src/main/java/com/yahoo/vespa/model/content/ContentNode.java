@@ -10,6 +10,7 @@ import com.yahoo.vespa.config.content.core.StorServerConfig;
 import com.yahoo.vespa.config.content.core.StorStatusConfig;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.PortReservation;
 import com.yahoo.vespa.model.application.validation.RestartConfigs;
 
 /**
@@ -64,17 +65,17 @@ public abstract class ContentNode extends AbstractService
 
     @Override
     public void getConfig(StorCommunicationmanagerConfig.Builder builder) {
-        builder.mbusport(getRelativePort(0));
-        builder.rpcport(getRelativePort(1));
+        builder.mbusport(getRelativePort(0).gotPort());
+        builder.rpcport(getRelativePort(1).gotPort());
     }
 
     @Override
     public void getConfig(StorStatusConfig.Builder builder) {
-        builder.httpport(getRelativePort(2));
+        builder.httpport(getRelativePort(2).gotPort());
     }
 
     @Override
-    public int getHealthPort()  {
+    public PortReservation getHealthPort()  {
         return getRelativePort(2);
     }
 }

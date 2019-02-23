@@ -32,7 +32,7 @@ public class SimpleService extends AbstractService implements com.yahoo.test.Sta
 
     @Override
     public void getConfig(Builder builder) {
-        builder.astring("simpleservice").baseport(getRelativePort(0));
+        builder.astring("simpleservice").baseport(getRelativePort(0).gotPort());
     }
     
     public int getWantedPort(){ return 10000; }

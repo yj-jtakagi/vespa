@@ -77,7 +77,7 @@ public class SearchNodeTest {
         node.initService(root.deployLogger());
         assertTrue(node.getPreShutdownCommand().isPresent());
         Assert.assertThat(node.getPreShutdownCommand().get(),
-                CoreMatchers.containsString("vespa-proton-cmd " + node.getRpcPort() + " prepareRestart"));
+                CoreMatchers.containsString("vespa-proton-cmd " + node.getRpcPort().gotPort() + " prepareRestart"));
     }
 
 }

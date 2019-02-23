@@ -138,7 +138,7 @@ public class ContainerSearch extends ContainerSubsystem<SearchChains>
                 for (Dispatch tld: ((IndexedSearchCluster)sys).getTLDs()) {
                 	scB.dispatcher(new QrSearchersConfig.Searchcluster.Dispatcher.Builder().
                 			host(tld.getHostname()).
-                			port(tld.getDispatchPort()));
+                			port(tld.getDispatchPort().gotPort()));
                 }
             } else {
             	scB.storagecluster(new QrSearchersConfig.Searchcluster.Storagecluster.Builder().

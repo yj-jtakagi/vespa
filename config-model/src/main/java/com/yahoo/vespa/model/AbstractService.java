@@ -45,7 +45,7 @@ public abstract class AbstractService extends AbstractConfigProducer<AbstractCon
     private int basePort;
 
     /** The ports allocated to this Service. */
-    private List<Integer> ports = new ArrayList<>();
+    private List<PortReservation> ports = new ArrayList<>();
 
     /** The optional JVM execution options for this Service. */
     // Please keep non-null, as passed to command line in service startup
@@ -221,7 +221,7 @@ public abstract class AbstractService extends AbstractConfigProducer<AbstractCon
      * @return the i'th port relative to the base port.
      * @throws IllegalStateException if i is out of range.
      */
-    public int getRelativePort(int i) {
+    public PortReservation getRelativePort(int i) {
         if (ports.size() < 1) {
             throw new IllegalStateException
                     ("Requested port with offset " + i + " for service that " +
@@ -349,7 +349,8 @@ public abstract class AbstractService extends AbstractConfigProducer<AbstractCon
     public ServiceInfo getServiceInfo() {
         Set<PortInfo> portInfos = new LinkedHashSet<>();
         for (int i = 0; i < portsMeta.getNumPorts(); i++) {
-            portInfos.add(new PortInfo(ports.get(i), new LinkedHashSet<>(portsMeta.getTagsAt(i))));
+            int got = getRelativePort(i).gotPort();
+            portInfos.add(new PortInfo(got, new LinkedHashSet<>(portsMeta.getTagsAt(i))));
         }
         Map<String, String> properties = new LinkedHashMap<>();
         for (Map.Entry<String, Object> prop : serviceProperties.entrySet()) {
@@ -483,8 +484,7 @@ public abstract class AbstractService extends AbstractConfigProducer<AbstractCon
      *  currently uses the first port as container http port.
      */
     public void reservePortPrepended(int port, String suffix) {
-        hostResource.reservePort(this, port, suffix);
-        ports.add(0, port);
+        ports.add(0, hostResource.reservePort(this, port, suffix));
     }
 
     public void setHostResource(HostResource hostResource) {
@@ -513,7 +513,7 @@ public abstract class AbstractService extends AbstractConfigProducer<AbstractCon
      * The service HTTP port for health status
      * @return portnumber
      */
-    public int getHealthPort() { return -1;}
+    public PortReservation getHealthPort() { return null; }
 
     /**
      * Overridden by subclasses. List of default dimensions to be added to this services metrics

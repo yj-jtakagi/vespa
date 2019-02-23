@@ -53,7 +53,7 @@ public class ConfigSentinel extends AbstractService implements SentinelConfig.Pr
     }
 
     @Override
-    public int getHealthPort() {return getRelativePort(1); }
+    public PortReservation getHealthPort() {return getRelativePort(1); }
 
     /**
      * Overrides parent method as this is named config-sentinel and not configsentinel all over Vespa

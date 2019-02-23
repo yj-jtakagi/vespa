@@ -198,8 +198,8 @@ public class AdminTestCase {
         Configserver server1 = admin.getConfigservers().get(0);
         assertEquals(admin.getConfigserver(), server1);
         assertThat(server1.getPortCount(), is(2));
-        assertThat(server1.getRelativePort(0), is(19070));
-        assertThat(server1.getRelativePort(1), is(19071));
+        assertThat(server1.getRelativePort(0).gotPort(), is(19070));
+        assertThat(server1.getRelativePort(1).gotPort(), is(19071));
 
 
         // Second configserver should be on second host but have the same port number
@@ -209,8 +209,8 @@ public class AdminTestCase {
         assertNotSame(server1.getHostName(), server2.getHostName());
 
         assertThat(server2.getPortCount(), is(2));
-        assertThat(server2.getRelativePort(0), is(19070));
-        assertThat(server2.getRelativePort(1), is(19071));
+        assertThat(server2.getRelativePort(0).gotPort(), is(19070));
+        assertThat(server2.getRelativePort(1).gotPort(), is(19071));
     }
 
     @Test

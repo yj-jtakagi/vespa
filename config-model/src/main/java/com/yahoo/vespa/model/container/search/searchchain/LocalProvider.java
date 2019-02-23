@@ -81,7 +81,7 @@ public class LocalProvider extends Provider implements
             builder.search_node(
                     new SearchNodesConfig.Search_node.Builder()
                             .host(searchNode.getHostName())
-                            .port(searchNode.getDispatchPort()));
+                            .port(searchNode.getDispatchPort().gotPort()));
         }
     }
 

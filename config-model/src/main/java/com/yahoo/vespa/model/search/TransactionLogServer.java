@@ -5,6 +5,7 @@ import com.yahoo.config.model.deploy.DeployState;
 import com.yahoo.searchlib.TranslogserverConfig;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.PortReservation;
 import com.yahoo.vespa.model.builder.xml.dom.VespaDomBuilder;
 import org.w3c.dom.Element;
 
@@ -48,7 +49,7 @@ public class TransactionLogServer extends AbstractService  {
      *
      * @return The port.
      */
-    public int getTlsPort() {
+    public PortReservation getTlsPort() {
         return getRelativePort(0);
     }
 
@@ -62,7 +63,9 @@ public class TransactionLogServer extends AbstractService  {
     }
 
     public void getConfig(TranslogserverConfig.Builder builder) {
-        builder.listenport(getTlsPort()).basedir(getTlsDir());
+        builder
+            .listenport(getTlsPort().gotPort())
+            .basedir(getTlsDir());
     }
 
 }

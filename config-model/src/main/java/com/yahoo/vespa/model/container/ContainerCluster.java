@@ -748,7 +748,7 @@ public final class ContainerCluster
         PortsMeta portsMeta = service.getPortsMeta();
         for (int i = 0; i < portsMeta.getNumPorts(); i++) {
             builders.add(new ClusterInfoConfig.Services.Ports.Builder()
-                            .number(service.getRelativePort(i))
+                            .number(service.getRelativePort(i).gotPort())
                             .tags(ApplicationConfigProducerRoot.getPortTags(portsMeta, i))
             );
         }

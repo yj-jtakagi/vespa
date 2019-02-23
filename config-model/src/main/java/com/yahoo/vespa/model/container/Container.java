@@ -13,6 +13,7 @@ import com.yahoo.container.jdisc.JdiscBindingsConfig;
 import com.yahoo.search.config.QrStartConfig;
 import com.yahoo.vespa.defaults.Defaults;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.PortReservation;
 import com.yahoo.vespa.model.application.validation.RestartConfigs;
 import com.yahoo.vespa.model.container.component.Component;
 import com.yahoo.vespa.model.container.component.ComponentGroup;
@@ -184,7 +185,7 @@ public class Container extends AbstractService implements
     }
 
     private void initDefaultJettyConnector() {
-        defaultHttpServer.addConnector(new ConnectorFactory("SearchServer", getSearchPort()));
+        defaultHttpServer.addConnector(new ConnectorFactory("SearchServer", getSearchPort().gotPort()));
     }
 
     private boolean hasDocproc() {
@@ -272,33 +273,33 @@ public class Container extends AbstractService implements
      * @return the actual search port
      * TODO: Remove. Use {@link #getPortsMeta()} and check tags in conjunction with {@link #getRelativePort(int)}.
      */
-    public int getSearchPort(){
+    public PortReservation getSearchPort(){
         if (getHttp() != null)
             throw new AssertionError("getSearchPort must not be used when http section is present.");
 
         return getRelativePort(0);
     }
 
-    private int getRpcPort() {
-        return rpcServerEnabled() ? getRelativePort(numHttpServerPorts + 1) : 0;
+    private PortReservation getRpcPort() {
+        return rpcServerEnabled() ? getRelativePort(numHttpServerPorts + 1) : null;
     }
 
-    private int getMessagingPort() {
+    private PortReservation getMessagingPort() {
         return getRelativePort(numHttpServerPorts);
     }
 
     @Override
-    public int getHealthPort()  {
+    public PortReservation getHealthPort()  {
         final Http http = getHttp();
         if (http != null) {
             // TODO: allow the user to specify health port manually
             if (http.getHttpServer() == null) {
-                return -1;
+                return null;
             } else {
                 return getRelativePort(0);
             }
         } else {
-            return httpServerEnabled() ? getSearchPort() : -1;
+            return httpServerEnabled() ? getSearchPort() : null;
         }
     }
 
@@ -311,7 +312,7 @@ public class Container extends AbstractService implements
         builder.
                 rpc(new Rpc.Builder()
                         .enabled(rpcServerEnabled())
-                        .port(getRpcPort())
+                        .port(getRpcPort().gotPort())
                         .slobrokId(serviceSlobrokId())).
                 filedistributor(filedistributorConfig());
         if (clusterName != null) {
@@ -386,7 +387,7 @@ public class Container extends AbstractService implements
 
     @Override
     public void getConfig(ContainerMbusConfig.Builder builder) {
-        builder.enabled(messageBusEnabled()).port(getMessagingPort());
+        builder.enabled(messageBusEnabled()).port(getMessagingPort().gotPort());
     }
 
     @Override

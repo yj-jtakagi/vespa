@@ -252,7 +252,7 @@ public class ApplicationConfigProducerRoot extends AbstractConfigProducer<Abstra
         PortsMeta portsMeta = modelService.getPortsMeta();
         for (int i = 0; i < portsMeta.getNumPorts(); i++) {
             ret.add(new Ports.Builder()
-                    .number(modelService.getRelativePort(i))
+                    .number(modelService.getRelativePort(i).gotPort())
                     .tags(getPortTags(portsMeta, i))
             );
         }

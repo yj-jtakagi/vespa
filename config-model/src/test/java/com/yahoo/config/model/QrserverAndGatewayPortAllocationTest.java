@@ -30,7 +30,7 @@ public class QrserverAndGatewayPortAllocationTest {
         VespaModel vespaModel = creator.create();
         List<Container> qrservers = vespaModel.getContainerClusters().get("container").getContainers();
         assertThat(qrservers.size(), is(1));
-        assertThat(qrservers.get(0).getSearchPort(), is(Container.BASEPORT));
+        assertThat(qrservers.get(0).getSearchPort().gotPort(), is(Container.BASEPORT));
     }
 
 }

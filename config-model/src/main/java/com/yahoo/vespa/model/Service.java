@@ -76,7 +76,7 @@ public interface Service extends ConfigProducer, NetworkPortRequestor {
      * @return the i'th port relative to the base port.
      * @throws IllegalStateException if i is out of range.
      */
-    int getRelativePort(int i);
+    PortReservation getRelativePort(int i);
 
     /**
      * Gets a service property value mapped to the given key
@@ -88,7 +88,7 @@ public interface Service extends ConfigProducer, NetworkPortRequestor {
      */
     String getServicePropertyString(String key, String defStr);
 
-    int getHealthPort();
+    PortReservation getHealthPort();
 
     /**
      *

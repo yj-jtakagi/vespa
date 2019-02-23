@@ -170,7 +170,7 @@ public class ContainerModelBuilderTest extends ContainerModelBuilderTestBase {
                 "</jdisc>" );
         createModel(root, clusterElem);
         AbstractService container = (AbstractService)root.getProducer("jdisc/container.0");
-        assertThat(container.getRelativePort(0), is(getDefaults().vespaWebServicePort()));
+        assertThat(container.getRelativePort(0).gotPort(), is(getDefaults().vespaWebServicePort()));
     }
 
     @Test
@@ -184,8 +184,8 @@ public class ContainerModelBuilderTest extends ContainerModelBuilderTestBase {
                 "</jdisc>" );
         createModel(root, clusterElem);
         AbstractService container = (AbstractService)root.getProducer("jdisc/container.0");
-        assertThat(container.getRelativePort(0), is(9000));
-        assertThat(container.getRelativePort(1), is(not(9001)));
+        assertThat(container.getRelativePort(0).gotPort(), is(9000));
+        assertThat(container.getRelativePort(1).gotPort(), is(not(9001)));
     }
 
     @Test

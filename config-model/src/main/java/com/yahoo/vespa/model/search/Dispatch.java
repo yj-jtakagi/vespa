@@ -5,6 +5,7 @@ import com.yahoo.vespa.config.search.core.FdispatchrcConfig;
 import com.yahoo.vespa.config.search.core.PartitionsConfig;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.PortReservation;
 import com.yahoo.vespa.model.application.validation.RestartConfigs;
 import com.yahoo.vespa.model.content.SearchCoverage;
 
@@ -89,10 +90,10 @@ public class Dispatch extends AbstractService implements SearchInterface,
         return "exec sbin/vespa-dispatch -c $VESPA_CONFIG_ID";
     }
 
-    public int getFrtPort()  { return getRelativePort(0); }
-    public int getDispatchPort()   { return getRelativePort(1); }
+    public PortReservation getFrtPort()  { return getRelativePort(0); }
+    public PortReservation getDispatchPort()   { return getRelativePort(1); }
     @Override
-    public int getHealthPort() { return getRelativePort(2); }
+    public PortReservation getHealthPort() { return getRelativePort(2); }
 
     /**
      * Twice the default of the number of threads in the container.
@@ -112,7 +113,7 @@ public class Dispatch extends AbstractService implements SearchInterface,
     }
 
     public String getDispatcherConnectSpec() {
-        return "tcp/" + getHost().getHostname() + ":" + getDispatchPort();
+        return "tcp/" + getHost().getHostname() + ":" + getDispatchPort().gotPort();
     }
 
     public DispatchGroup getDispatchGroup() {
@@ -121,9 +122,9 @@ public class Dispatch extends AbstractService implements SearchInterface,
 
     @Override
     public void getConfig(FdispatchrcConfig.Builder builder) {
-        builder.ptport(getDispatchPort()).
-                frtport(getFrtPort()).
-                healthport(getHealthPort()).
+        builder.ptport(getDispatchPort().gotPort()).
+                frtport(getFrtPort().gotPort()).
+                healthport(getHealthPort().gotPort()).
                 maxthreads(getMaxThreads());
         if (!isTopLevel) {
             builder.partition(getNodeSpec().partitionId());

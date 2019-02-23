@@ -3,6 +3,7 @@ package com.yahoo.vespa.model.admin;
 
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.PortReservation;
 
 /**
  * Represents a Configserver. There may be one or more Configservers in a
@@ -65,16 +66,16 @@ public class Configserver extends AbstractService {
      */
     public boolean getAutorestartFlag() { return false; }
 
-    private int getConfigServerRpcPort() {
+    private PortReservation getConfigServerRpcPort() {
         return getRelativePort(0);
     }
 
-    private int getConfigServerHttpPort() {
+    private PortReservation getConfigServerHttpPort() {
         return getRelativePort(1);
     }
 
     @Override
-    public int getHealthPort()  {
+    public PortReservation getHealthPort()  {
         return getRelativePort(1);
     }
 

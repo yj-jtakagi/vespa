@@ -416,8 +416,8 @@ public class IndexedSearchCluster extends SearchCluster
             nodeBuilder.key(node.getDistributionKey());
             nodeBuilder.group(node.getNodeSpec().groupIndex());
             nodeBuilder.host(node.getHostName());
-            nodeBuilder.port(node.getRpcPort());
-            nodeBuilder.fs4port(node.getDispatchPort());
+            nodeBuilder.port(node.getRpcPort().gotPort());
+            nodeBuilder.fs4port(node.getDispatchPort().gotPort());
             builder.node(nodeBuilder);
         }
         if (tuning.dispatch.minActiveDocsCoverage != null)

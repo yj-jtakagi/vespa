@@ -16,6 +16,7 @@ import com.yahoo.vespa.config.content.core.StorStatusConfig;
 import com.yahoo.vespa.config.search.core.ProtonConfig;
 import static com.yahoo.vespa.defaults.Defaults.getDefaults;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.PortReservation;
 import com.yahoo.vespa.model.admin.monitoring.Monitoring;
 import com.yahoo.vespa.model.application.validation.RestartConfigs;
 import com.yahoo.vespa.model.builder.xml.dom.VespaDomBuilder;
@@ -170,12 +171,12 @@ public class SearchNode extends AbstractService implements
      *
      * @return The port.
      */
-    public int getRpcPort() {
+    public PortReservation getRpcPort() {
         return getRelativePort(RPC_PORT);
     }
 
     @Override
-    public int getHealthPort() {
+    public PortReservation getHealthPort() {
         return getHttpPort();
     }
 
@@ -195,14 +196,14 @@ public class SearchNode extends AbstractService implements
      * @return The connection string.
      */
     public String getDispatcherConnectSpec() {
-        return "tcp/" + getHost().getHostname() + ":" + getDispatchPort();
+        return "tcp/" + getHost().getHostname() + ":" + getDispatchPort().gotPort();
     }
 
-    public int getDispatchPort() {
+    public PortReservation getDispatchPort() {
         return getRelativePort(FS4_PORT);
     }
 
-    public int getHttpPort() {
+    public PortReservation getHttpPort() {
         return getRelativePort(HEALTH_PORT);
     }
 
@@ -249,13 +250,13 @@ public class SearchNode extends AbstractService implements
     @Override
     public void getConfig(ProtonConfig.Builder builder) {
         builder.
-            ptport(getDispatchPort()).
-            rpcport(getRpcPort()).
-            httpport(getHttpPort()).
+            ptport(getDispatchPort().gotPort()).
+            rpcport(getRpcPort().gotPort()).
+            httpport(getHttpPort().gotPort()).
             partition(getNodeSpec().partitionId()).
             clustername(getClusterName()).
             basedir(getBaseDir()).
-            tlsspec("tcp/" + getHost().getHostname() + ":" + getTransactionLogServer().getTlsPort()).
+            tlsspec("tcp/" + getHost().getHostname() + ":" + getTransactionLogServer().getTlsPort().gotPort()).
             tlsconfigid(getConfigId()).
             slobrokconfigid(getClusterConfigId()).
             routingconfigid(getClusterConfigId()).
@@ -300,7 +301,7 @@ public class SearchNode extends AbstractService implements
 
     @Override
     public Optional<String> getPreShutdownCommand() {
-        return Optional.ofNullable(flushOnShutdown ? getDefaults().underVespaHome("bin/vespa-proton-cmd ") + getRpcPort() + " prepareRestart" : null);
+        return Optional.ofNullable(flushOnShutdown ? getDefaults().underVespaHome("bin/vespa-proton-cmd ") + getRpcPort().gotPort() + " prepareRestart" : null);
     }
 
 }

@@ -46,9 +46,9 @@ public class Logd
     public String getStartupCommand() { return "exec sbin/vespa-logd"; }
 
     @Override
-    public int getHealthPort() { return getRelativePort(0); }
+    public PortReservation getHealthPort() { return getRelativePort(0); }
 
     public void getConfig(LogdConfig.Builder builder) {
-        builder.stateport(getHealthPort());
+        builder.stateport(getHealthPort().gotPort());
     }
 }
