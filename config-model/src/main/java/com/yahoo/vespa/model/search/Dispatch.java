@@ -90,7 +90,7 @@ public class Dispatch extends AbstractService implements SearchInterface,
         return "exec sbin/vespa-dispatch -c $VESPA_CONFIG_ID";
     }
 
-    public PortReservation getFrtPort()  { return getRelativePort(0); }
+    private PortReservation getFrtPort()  { return getRelativePort(0); }
     public PortReservation getDispatchPort()   { return getRelativePort(1); }
     @Override
     public PortReservation getHealthPort() { return getRelativePort(2); }

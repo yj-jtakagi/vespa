@@ -203,7 +203,7 @@ public class SearchNode extends AbstractService implements
         return getRelativePort(FS4_PORT);
     }
 
-    public PortReservation getHttpPort() {
+    private PortReservation getHttpPort() {
         return getRelativePort(HEALTH_PORT);
     }
 
@@ -301,7 +301,13 @@ public class SearchNode extends AbstractService implements
 
     @Override
     public Optional<String> getPreShutdownCommand() {
-        return Optional.ofNullable(flushOnShutdown ? getDefaults().underVespaHome("bin/vespa-proton-cmd ") + getRpcPort().gotPort() + " prepareRestart" : null);
+        if (flushOnShutdown) {
+            int port = getRpcPort().gotPort();
+            String cmd = getDefaults().underVespaHome("bin/vespa-proton-cmd ") + port + " prepareRestart";
+            return Optional.of(cmd);
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

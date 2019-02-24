@@ -49,7 +49,7 @@ public class TransactionLogServer extends AbstractService  {
      *
      * @return The port.
      */
-    public PortReservation getTlsPort() {
+    PortReservation getTlsPort() {
         return getRelativePort(0);
     }
 

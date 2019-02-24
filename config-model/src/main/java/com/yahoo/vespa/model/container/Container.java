@@ -273,15 +273,15 @@ public class Container extends AbstractService implements
      * @return the actual search port
      * TODO: Remove. Use {@link #getPortsMeta()} and check tags in conjunction with {@link #getRelativePort(int)}.
      */
-    public PortReservation getSearchPort(){
+    public PortReservation getSearchPort() {
         if (getHttp() != null)
             throw new AssertionError("getSearchPort must not be used when http section is present.");
 
         return getRelativePort(0);
     }
 
-    private PortReservation getRpcPort() {
-        return rpcServerEnabled() ? getRelativePort(numHttpServerPorts + 1) : null;
+    private int getRpcPortNumber() {
+        return rpcServerEnabled() ? getRelativePort(numHttpServerPorts + 1).gotPort() : 0;
     }
 
     private PortReservation getMessagingPort() {
@@ -312,7 +312,7 @@ public class Container extends AbstractService implements
         builder.
                 rpc(new Rpc.Builder()
                         .enabled(rpcServerEnabled())
-                        .port(getRpcPort().gotPort())
+                        .port(getRpcPortNumber())
                         .slobrokId(serviceSlobrokId())).
                 filedistributor(filedistributorConfig());
         if (clusterName != null) {

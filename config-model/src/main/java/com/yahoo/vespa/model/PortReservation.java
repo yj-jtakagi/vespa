@@ -27,18 +27,21 @@ import java.util.stream.Collectors;
  * @author arnej
  */
 public class PortReservation {
-    private int resolvedPort = 0;
+    private int resolvedPort = -1;
 
     public int gotPort() {
-        if (resolvedPort == 0) {
+        if (resolvedPort < 0) {
             throw new IllegalArgumentException("Cannot get port for "+this+", must be resolved first");
         }
         return resolvedPort;
     }
 
     public void resolve(int port) {
-        if (resolvedPort != 0) {
+        if (resolvedPort >= 0) {
             throw new IllegalArgumentException("Cannot resolve port twice for "+this);
+        }
+        if (port < 0) {
+            throw new IllegalArgumentException("Resolving to port "+port+" does not make sense for "+this);
         }
         this.resolvedPort = port;
     }
@@ -69,7 +72,7 @@ public class PortReservation {
         if (wantedPort != 0) buf.append("want=").append(wantedPort).append(" ");
         if (requiresWantedPort) buf.append("required ");
         buf.append("service=").append(service.toString());
-        buf.append("suffix=").append(suffix);
+        buf.append(" suffix=").append(suffix);
         buf.append("]");
         return buf.toString();
    }

@@ -16,7 +16,7 @@ public class Slobrok extends AbstractService implements StateserverConfig.Produc
 
     @Override
     public void getConfig(StateserverConfig.Builder builder) {
-        builder.httpport(getStatePort().gotPort());
+        builder.httpport(getHealthPort().gotPort());
     }
 
     /**
@@ -47,7 +47,7 @@ public class Slobrok extends AbstractService implements StateserverConfig.Produc
     }
 
     public String getStartupCommand() {
-        return "exec $ROOT/sbin/vespa-slobrok -p " + getPort().gotPort() + " -c " + getConfigId();
+        return "exec $ROOT/sbin/vespa-slobrok -p " + getRpcPort().gotPort() + " -c " + getConfigId();
     }
 
     /**
@@ -65,14 +65,15 @@ public class Slobrok extends AbstractService implements StateserverConfig.Produc
     /**
      * @return The port on which this slobrok should respond
      */
-    private PortReservation getPort() {
+    private PortReservation getRpcPort() {
         return getRelativePort(0);
     }
 
     /**
      * @return The port on which the state server should respond
      */
-    public PortReservation getStatePort() {
+    @Override
+    public PortReservation getHealthPort() {
         return getRelativePort(1);
     }
 
@@ -80,7 +81,7 @@ public class Slobrok extends AbstractService implements StateserverConfig.Produc
      * @return The connection spec to this Slobrok
      */
     public String getConnectionSpec() {
-        return "tcp/" + getHostName() + ":" + getPort();
+        return "tcp/" + getHostName() + ":" + getRpcPort().gotPort();
     }
 
 }
