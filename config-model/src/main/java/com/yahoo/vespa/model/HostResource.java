@@ -79,14 +79,13 @@ public class HostResource
      */
     List<Integer> allocateService(DeployLogger deployLogger, AbstractService service, int wantedPort) {
         useLogger(deployLogger);
-        NetworkPortAllocator allocator = new NetworkPortAllocator(this, service);
-        service.allocatePorts(wantedPort, allocator);
+        List<Integer> ports = allocatePorts(service, wantedPort);
         assert (getService(service.getServiceName()) == null) :
                 ("There is already a service with name '" + service.getServiceName() + "' registered on " + this +
                 ". Most likely a programming error - all service classes must have unique names, even in different packages!");
 
         services.put(service.getServiceName(), service);
-        return allocator.result();
+        return ports;
     }
 
     /**
