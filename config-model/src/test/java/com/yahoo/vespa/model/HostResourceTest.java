@@ -136,13 +136,5 @@ public class HostResourceTest {
         @Override
         public int getPortCount() { return portCount; }
 
-        @Override
-        public String[] getPortSuffixes() {
-            String[] suffixes = new String[portCount];
-            for (int i = 0; i < portCount; i++) {
-                suffixes[i] = "generic." + i;
-            }
-            return suffixes;
-        }
     }
 }

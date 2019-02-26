@@ -45,12 +45,6 @@ public interface NetworkPortRequestor {
      */
     default boolean requiresConsecutivePorts() { return true; }
 
-    /**
-     * Return names for each port requested.
-     * The size of the returned array must be equal to getPortCount().
-     **/
-    String[] getPortSuffixes();
-
     /** allocate the ports you need */
     void allocatePorts(int start, NetworkPortAllocator from);
 }

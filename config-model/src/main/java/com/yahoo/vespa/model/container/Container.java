@@ -260,34 +260,6 @@ public class Container extends AbstractService implements
         return httpPorts + rpcPorts;
     }
 
-    @Override
-    public String[] getPortSuffixes() {
-        // TODO clean up this mess
-        int n = getPortCount();
-        String[] suffixes = new String[n];
-        int off = 0;
-        int httpPorts = (getHttp() != null) ? 0 : numHttpServerPorts;
-        if (httpPorts > 0) {
-            suffixes[off++] = "http";
-        }
-        for (int i = 1; i < httpPorts; i++) {
-            suffixes[off++] = "http/" + i;
-        }
-        int rpcPorts = (rpcServerEnabled()) ? numRpcServerPorts : 0;
-        if (rpcPorts > 0) {
-            suffixes[off++] = "messaging";
-        }
-        if (rpcPorts > 1) {
-            suffixes[off++] = "rpc";
-        }
-        while (off < n) {
-            suffixes[off] = "unused/" + off;
-            ++off;
-        }
-        assert (off == n);
-        return suffixes;
-    }
-
     /**
      * @return the actual search port
      * TODO: Remove. Use {@link #getPortsMeta()} and check tags in conjunction with {@link #getRelativePort(int)}.

@@ -80,9 +80,4 @@ public class Logserver extends AbstractService {
         from.requirePort(port++, "replicator");
     }
 
-    @Override
-    public String[] getPortSuffixes() {
-        return new String[]{ "unused", "logtp", "last.errors", "replicator" };
-    }
-
 }

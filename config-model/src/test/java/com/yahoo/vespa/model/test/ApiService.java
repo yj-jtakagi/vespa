@@ -37,5 +37,4 @@ public class ApiService extends AbstractService implements com.yahoo.test.Standa
 
     @Override public void allocatePorts(int start, NetworkPortAllocator from) { }
     @Override public int getPortCount() { return 0; }
-    @Override public String[] getPortSuffixes() { return null; }
 }

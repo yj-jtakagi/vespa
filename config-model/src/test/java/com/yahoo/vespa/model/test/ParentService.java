@@ -60,5 +60,4 @@ public class ParentService extends AbstractService implements com.yahoo.test.Sta
     
     @Override public void allocatePorts(int start, NetworkPortAllocator from) { }
     @Override public int getPortCount() { return 0; }
-    @Override public String[] getPortSuffixes() { return null; }
 }
