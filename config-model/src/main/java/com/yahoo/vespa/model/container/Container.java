@@ -218,10 +218,6 @@ public class Container extends AbstractService implements
         return getHttp() == null;
     }
 
-    public boolean requiresConsecutivePorts() {
-        return false;
-    }
-
     @Override
     public void allocatePorts(int start, NetworkPortAllocator from) {
         if (start == 0) start = BASEPORT;
