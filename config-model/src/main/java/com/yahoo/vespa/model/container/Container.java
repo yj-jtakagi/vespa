@@ -252,7 +252,7 @@ public class Container extends AbstractService implements
     }
 
     /**
-     * @return the number of ports needed by the Container - those reserved manually(reservePortPrepended)
+     * @return the number of ports needed by the Container - those reserved manually
      */
     public int getPortCount() {
         int httpPorts = (getHttp() != null) ? 0 : numHttpServerPorts + 2; // TODO remove +2, only here to keep irrelevant unit tests from failing.
