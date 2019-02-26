@@ -13,6 +13,7 @@ import com.yahoo.container.jdisc.JdiscBindingsConfig;
 import com.yahoo.search.config.QrStartConfig;
 import com.yahoo.vespa.defaults.Defaults;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 import com.yahoo.vespa.model.application.validation.RestartConfigs;
 import com.yahoo.vespa.model.container.component.Component;
 import com.yahoo.vespa.model.container.component.ComponentGroup;
@@ -150,8 +151,6 @@ public class Container extends AbstractService implements
 
         if (getHttp() == null) {
             initDefaultJettyConnector();
-        } else {
-            reserveHttpPortsPrepended();
         }
 
         tagServers();
@@ -168,14 +167,6 @@ public class Container extends AbstractService implements
         if (rpcServerEnabled()) {
             portsMeta.on(numHttpServerPorts + 0).tag("rpc").tag("messaging");
             portsMeta.on(numHttpServerPorts + 1).tag("rpc").tag("admin");
-        }
-    }
-
-    private void reserveHttpPortsPrepended() {
-        if (getHttp().getHttpServer() != null) {
-            for (ConnectorFactory connectorFactory : getHttp().getHttpServer().getConnectorFactories()) {
-                reservePortPrepended(getPort(connectorFactory), "http/" + connectorFactory.getName());
-            }
         }
     }
 
@@ -229,6 +220,35 @@ public class Container extends AbstractService implements
 
     public boolean requiresConsecutivePorts() {
         return false;
+    }
+
+    @Override
+    public void allocatePorts(int start, NetworkPortAllocator from) {
+        if (start == 0) start = BASEPORT;
+        int off = 2;
+        if (getHttp() == null) {
+            from.requirePort(start, "http");
+            from.allocatePort("http/1");
+        } else if (getHttp().getHttpServer() == null) {
+            // no http server ports
+        } else {
+            for (ConnectorFactory connectorFactory : getHttp().getHttpServer().getConnectorFactories()) {
+                int port = getPort(connectorFactory);
+                String name = "http/" + connectorFactory.getName();
+                from.requirePort(port, name);
+            }
+        }
+        if (rpcServerEnabled()) {
+            from.allocatePort("messaging");
+            from.allocatePort("rpc");
+            off += 2;
+        }
+        // TODO: remove this
+        if (getHttp() == null) {
+            from.allocatePort("unused/" + off);
+            ++off;
+            from.allocatePort("unused/" + off);
+        }
     }
 
     /**

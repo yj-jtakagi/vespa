@@ -10,6 +10,7 @@ import com.yahoo.vespa.config.content.core.StorServerConfig;
 import com.yahoo.vespa.config.content.core.StorStatusConfig;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 import com.yahoo.vespa.model.application.validation.RestartConfigs;
 
 /**
@@ -52,6 +53,19 @@ public abstract class ContentNode extends AbstractService
         portsMeta.on(0).tag("messaging");
         portsMeta.on(1).tag("rpc").tag("status");
         portsMeta.on(2).tag("http").tag("status").tag("state");
+    }
+
+    @Override
+    public void allocatePorts(int start, NetworkPortAllocator from) {
+        if (start == 0) {
+            from.allocatePort("messaging");
+            from.allocatePort("rpc");
+            from.allocatePort("http");
+        } else {
+            from.wantPort(start++, "messaging");
+            from.wantPort(start++, "rpc");
+            from.wantPort(start++, "http");
+        }
     }
 
     @Override

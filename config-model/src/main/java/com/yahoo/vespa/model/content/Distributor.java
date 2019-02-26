@@ -2,8 +2,9 @@
 package com.yahoo.vespa.model.content;
 
 import com.yahoo.config.model.deploy.DeployState;
-import com.yahoo.vespa.config.content.core.StorServerConfig;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
+import com.yahoo.vespa.config.content.core.StorServerConfig;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 import com.yahoo.vespa.model.builder.xml.dom.ModelElement;
 import com.yahoo.vespa.model.builder.xml.dom.VespaDomBuilder;
 import com.yahoo.vespa.model.content.engines.PersistenceEngine;

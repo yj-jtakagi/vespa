@@ -122,6 +122,18 @@ public class HostResourceTest {
         }
 
         @Override
+        public void allocatePorts(int start, NetworkPortAllocator from) {
+            for (int i = 0; i < portCount; i++) {
+                String suffix = "generic." + i;
+                if (start == 0) {
+                    from.allocatePort(suffix);
+                } else {
+                    from.requirePort(start++, suffix);
+                }
+            }
+        }
+
+        @Override
         public int getPortCount() { return portCount; }
 
         @Override

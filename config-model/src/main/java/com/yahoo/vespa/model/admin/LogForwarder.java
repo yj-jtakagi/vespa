@@ -4,6 +4,7 @@ package com.yahoo.vespa.model.admin;
 import com.yahoo.cloud.config.LogforwarderConfig;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,10 @@ public class LogForwarder extends AbstractService implements LogforwarderConfig.
     public static Config cfg() {
         return new Config(null, null, null);
     }
+
+    // LogForwarder does not need any ports.
+    @Override
+    public void allocatePorts(int start, NetworkPortAllocator from) {}
 
     /**
      * LogForwarder does not need any ports.

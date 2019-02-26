@@ -5,6 +5,7 @@ import com.yahoo.config.model.deploy.DeployState;
 import com.yahoo.searchlib.TranslogserverConfig;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 import com.yahoo.vespa.model.builder.xml.dom.VespaDomBuilder;
 import org.w3c.dom.Element;
 
@@ -32,6 +33,12 @@ public class TransactionLogServer extends AbstractService  {
         protected TransactionLogServer doBuild(DeployState deployState, AbstractConfigProducer ancestor, Element producerSpec) {
             return new TransactionLogServer(ancestor, clusterName);
         }
+    }
+
+    @Override
+    public void allocatePorts(int start, NetworkPortAllocator from) {
+        // NB: ignore "start"
+        from.allocatePort("tls");
     }
 
     public int getPortCount() {

@@ -50,4 +50,7 @@ public interface NetworkPortRequestor {
      * The size of the returned array must be equal to getPortCount().
      **/
     String[] getPortSuffixes();
+
+    /** allocate the ports you need */
+    void allocatePorts(int start, NetworkPortAllocator from);
 }

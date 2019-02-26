@@ -4,6 +4,7 @@ package com.yahoo.vespa.model.test;
 import com.yahoo.test.StandardConfig.Builder;
 import com.yahoo.config.model.producer.AbstractConfigProducer;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 
 import java.util.HashMap;
 
@@ -37,6 +38,16 @@ public class SimpleService extends AbstractService implements com.yahoo.test.Sta
     
     public int getWantedPort(){ return 10000; }
     public int getPortCount() { return 5; }
+
+    @Override
+    public void allocatePorts(int start, NetworkPortAllocator from) {
+        if (start == 0) start = getWantedPort();
+        from.wantPort(start++, "a");
+        from.wantPort(start++, "b");
+        from.wantPort(start++, "c");
+        from.wantPort(start++, "d");
+        from.wantPort(start++, "e");
+    }
 
     @Override
     public String[] getPortSuffixes() {

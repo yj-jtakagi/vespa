@@ -3,6 +3,7 @@ package com.yahoo.vespa.model.generic.service;
 
 import com.yahoo.vespa.model.AbstractService;
 import com.yahoo.vespa.model.HostResource;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 
 /**
  * An application specific generic service
@@ -17,6 +18,9 @@ public class Service extends AbstractService {
         setProp("clustertype", parent.getName());
         setProp("clustername", parent.getName());
     }
+
+    @Override
+    public void allocatePorts(int start, NetworkPortAllocator from) { }
 
     @Override
     public int getPortCount() {

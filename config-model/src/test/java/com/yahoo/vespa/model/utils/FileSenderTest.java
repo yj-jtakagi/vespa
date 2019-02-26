@@ -9,6 +9,7 @@ import com.yahoo.config.model.producer.UserConfigRepo;
 import com.yahoo.config.model.test.MockRoot;
 import com.yahoo.vespa.config.*;
 import com.yahoo.vespa.model.AbstractService;
+import com.yahoo.vespa.model.NetworkPortAllocator;
 import com.yahoo.vespa.model.SimpleConfigProducer;
 import org.junit.Before;
 import org.junit.Test;
@@ -168,12 +169,8 @@ public class FileSenderTest {
             return pathToRef.get(relativePath);
         }
 
-        @Override
-        public int getPortCount() {
-            return 0;
-        }
-
-        @Override
-        public String[] getPortSuffixes() { return null; }
+        @Override public void allocatePorts(int start, NetworkPortAllocator from) { }
+        @Override public int getPortCount() { return 0; }
+        @Override public String[] getPortSuffixes() { return null; }
     }
 }
