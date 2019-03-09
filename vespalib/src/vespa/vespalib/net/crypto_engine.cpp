@@ -234,7 +234,11 @@ CryptoEngine::SP try_create_default_crypto_engine() {
         return create_default_crypto_engine();
     } catch (net::tls::CryptoException &e) {
         LOG(error, "failed to create default crypto engine: %s", e.what());
+#ifdef __linux__
         std::quick_exit(78);
+#else
+        _exit(78);
+#endif
     }
 }
 

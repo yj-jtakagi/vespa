@@ -267,8 +267,11 @@ ControlFile::getLevels(const char *name)
 
     char *baseAddr = _mapBase + fileLength + strlen(appendedString);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
     strncat(appendedString, inheritLevels, Logger::NUM_LOGLEVELS*sizeof(int));
     strcat(appendedString, "\n");
+#pragma GCC diagnostic push
 
     int len = strlen(appendedString);
 
