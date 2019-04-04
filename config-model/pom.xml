@@ -96,6 +96,13 @@
     </dependency>
     <dependency>
       <groupId>com.yahoo.vespa</groupId>
+      <artifactId>metrics-proxy</artifactId>
+      <version>${project.version}</version>
+      <!-- GVL TODO: review scope. If provided, we must add the bundle to configserver-app and add dep to fat-model-deps -->
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.yahoo.vespa</groupId>
       <artifactId>container-disc</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
