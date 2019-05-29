@@ -165,7 +165,8 @@ ConfigStatus::action()
                     if (!upToDate) {
                         if (svc.type == "searchnode" ||
                             svc.type == "topleveldispatch" ||
-                            svc.type == "logd")
+                            svc.type == "logd" ||
+                            svc.type == "metricsproxy-container")
                         {
                             std::cerr << "[generation not up-to-date ignored]" << std::endl;
                         } else {
