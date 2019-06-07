@@ -9,7 +9,7 @@ PROTOBUF_GENERATE_CPP(storageapi_PROTOBUF_SRCS storageapi_PROTOBUF_HDRS
 
 # protoc-generated files emit compiler warnings that we normally treat as errors.
 # Instead of rolling our own compiler plugin we'll pragmatically disable the noise.
-if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   set_source_files_properties(${storageapi_PROTOBUF_SRCS} PROPERTIES COMPILE_FLAGS "-Wno-array-bounds -Wno-suggest-override -Wno-inline")
 endif()
 # protoc explicitly annotates methods with inline, which triggers -Werror=inline when
