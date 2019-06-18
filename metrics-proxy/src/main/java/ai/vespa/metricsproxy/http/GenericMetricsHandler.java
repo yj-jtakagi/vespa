@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.logging.Logger;
 
 import static ai.vespa.metricsproxy.metric.model.json.GenericJsonUtil.toGenericJsonModel;
 
@@ -28,6 +29,7 @@ import static ai.vespa.metricsproxy.metric.model.json.GenericJsonUtil.toGenericJ
  * @author gjoranv
  */
 public class GenericMetricsHandler extends ThreadedHttpRequestHandler {
+    private static final Logger log = Logger.getLogger(GenericMetricsHandler.class.getName());
 
     private final MetricsManager metricsManager;
     private final VespaServices vespaServices;
@@ -42,6 +44,9 @@ public class GenericMetricsHandler extends ThreadedHttpRequestHandler {
     @Override
     public HttpResponse handle(HttpRequest request) {
         try {
+            String consumer = request.getProperty("consumer");
+            log.warning("GVL consumer: " + consumer);
+
             List<MetricsPacket> metrics = metricsManager.getMetrics(vespaServices.getVespaServices(), Instant.now());
             return new Response(200, toGenericJsonModel(metrics).serialize());
         } catch (JsonRenderingException e) {
