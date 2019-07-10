@@ -7,7 +7,6 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.InspectExecResponse;
 import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.command.UpdateContainerCmd;
-import com.github.dockerjava.api.exception.DockerClientException;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.dockerjava.api.model.HostConfig;
@@ -40,6 +39,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -67,6 +67,7 @@ public class DockerImpl implements Docker {
         this.dockerImageGC = new DockerImageGarbageCollector(this);
 
         numberOfDockerApiFails = metrics.declareCounter("docker.api_fails");
+        Logger.getLogger(ResultCallbackTemplate.class.getName()).setLevel(Level.OFF);
     }
 
     @Override
@@ -346,6 +347,7 @@ public class DockerImpl implements Docker {
         public void onError(Throwable throwable) {
             removeScheduledPoll(dockerImage);
             logger.log(LogLevel.ERROR, "Could not download image " + dockerImage.asString(), throwable);
+            super.onError(throwable);
         }
 
 
@@ -356,8 +358,9 @@ public class DockerImpl implements Docker {
                 removeScheduledPoll(dockerImage);
             } else {
                 numberOfDockerApiFails.increment();
-                throw new DockerClientException("Could not download image: " + dockerImage);
+                logger.log(LogLevel.ERROR, "Failed to download image: " + dockerImage);
             }
+            super.onComplete();
         }
     }
 
